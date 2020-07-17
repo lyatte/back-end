@@ -1,0 +1,80 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+#
+#type Todo {
+#  id: ID!
+#  text: String!
+#  done: Boolean!
+#  user: User!
+#}
+#
+#type User {
+#  id: ID!
+#  name: String!
+#}
+#
+#type Query {
+#  todos: [Todo!]!
+#}
+#
+#input NewTodo {
+#  text: String!
+#  userId: String!
+#}
+#
+#type Mutation {
+#  createTodo(input: NewTodo!): Todo!
+#}
+
+type Video{
+  videoId: ID!
+  videoTitle: String!
+  videoDescription: String!
+  videoCategory: String!
+  videoLike: Int!
+  videoDislike: Int!
+  videoPrivacy: String!
+  videoPremium: Boolean!
+  videoRestriction: Boolean!
+  videoThumbnail: String!
+  video: String!
+  channelId: Int!
+  videoViews: Int!
+  videoRegion: String!
+  day: Int!
+  month: Int!
+  year: Int!
+}
+
+type Query{
+  videos: [Video!]!
+}
+
+input newVideo{
+  videoTitle: String!
+  videoDescription: String!
+  videoCategory: String!
+  videoLike: Int!
+  videoDislike: Int!
+  videoPrivacy: String!
+  videoPremium: Boolean!
+  videoRestriction: Boolean!
+  videoThumbnail: String!
+  video: String!
+  channelId: Int!
+  videoViews: Int!
+  videoRegion: String!
+  day: Int!
+  month: Int!
+  year: Int!
+}
+
+
+type Mutation{
+  createVideo (input: newVideo): Video!
+  updateVideo (videoId: ID!, input: newVideo): Video!
+  deleteVideo (videoId: ID!): Boolean!
+}
+
+
