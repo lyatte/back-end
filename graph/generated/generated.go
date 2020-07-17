@@ -50,7 +50,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Videos func(childComplexity int) int
+		GetVideo func(childComplexity int) int
+		Videos   func(childComplexity int) int
 	}
 
 	Video struct {
@@ -81,6 +82,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Videos(ctx context.Context) ([]*model.Video, error)
+	GetVideo(ctx context.Context) ([]*model.Video, error)
 }
 
 type executableSchema struct {
@@ -120,7 +122,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteVideo(childComplexity, args["videoId"].(string)), true
+		return e.complexity.Mutation.DeleteVideo(childComplexity, args["video_id"].(string)), true
 
 	case "Mutation.updateVideo":
 		if e.complexity.Mutation.UpdateVideo == nil {
@@ -132,7 +134,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateVideo(childComplexity, args["videoId"].(string), args["input"].(*model.NewVideo)), true
+		return e.complexity.Mutation.UpdateVideo(childComplexity, args["video_id"].(string), args["input"].(*model.NewVideo)), true
+
+	case "Query.getVideo":
+		if e.complexity.Query.GetVideo == nil {
+			break
+		}
+
+		return e.complexity.Query.GetVideo(childComplexity), true
 
 	case "Query.videos":
 		if e.complexity.Query.Videos == nil {
@@ -141,7 +150,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Videos(childComplexity), true
 
-	case "Video.channelId":
+	case "Video.channel_id":
 		if e.complexity.Video.ChannelID == nil {
 			break
 		}
@@ -169,84 +178,84 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Video.Video(childComplexity), true
 
-	case "Video.videoCategory":
+	case "Video.video_category":
 		if e.complexity.Video.VideoCategory == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoCategory(childComplexity), true
 
-	case "Video.videoDescription":
+	case "Video.video_description":
 		if e.complexity.Video.VideoDescription == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoDescription(childComplexity), true
 
-	case "Video.videoDislike":
+	case "Video.video_dislike":
 		if e.complexity.Video.VideoDislike == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoDislike(childComplexity), true
 
-	case "Video.videoId":
+	case "Video.video_id":
 		if e.complexity.Video.VideoID == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoID(childComplexity), true
 
-	case "Video.videoLike":
+	case "Video.video_like":
 		if e.complexity.Video.VideoLike == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoLike(childComplexity), true
 
-	case "Video.videoPremium":
+	case "Video.video_premium":
 		if e.complexity.Video.VideoPremium == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoPremium(childComplexity), true
 
-	case "Video.videoPrivacy":
+	case "Video.video_privacy":
 		if e.complexity.Video.VideoPrivacy == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoPrivacy(childComplexity), true
 
-	case "Video.videoRegion":
+	case "Video.video_region":
 		if e.complexity.Video.VideoRegion == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoRegion(childComplexity), true
 
-	case "Video.videoRestriction":
+	case "Video.video_restriction":
 		if e.complexity.Video.VideoRestriction == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoRestriction(childComplexity), true
 
-	case "Video.videoThumbnail":
+	case "Video.video_thumbnail":
 		if e.complexity.Video.VideoThumbnail == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoThumbnail(childComplexity), true
 
-	case "Video.videoTitle":
+	case "Video.video_title":
 		if e.complexity.Video.VideoTitle == nil {
 			break
 		}
 
 		return e.complexity.Video.VideoTitle(childComplexity), true
 
-	case "Video.videoViews":
+	case "Video.video_views":
 		if e.complexity.Video.VideoViews == nil {
 			break
 		}
@@ -328,46 +337,23 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 #
-#type Todo {
-#  id: ID!
-#  text: String!
-#  done: Boolean!
-#  user: User!
-#}
-#
-#type User {
-#  id: ID!
-#  name: String!
-#}
-#
-#type Query {
-#  todos: [Todo!]!
-#}
-#
-#input NewTodo {
-#  text: String!
-#  userId: String!
-#}
-#
-#type Mutation {
-#  createTodo(input: NewTodo!): Todo!
-#}
+
 
 type Video{
-  videoId: ID!
-  videoTitle: String!
-  videoDescription: String!
-  videoCategory: String!
-  videoLike: Int!
-  videoDislike: Int!
-  videoPrivacy: String!
-  videoPremium: Boolean!
-  videoRestriction: Boolean!
-  videoThumbnail: String!
+  video_id: ID!
+  video_title: String!
+  video_description: String!
+  video_category: String!
+  video_like: Int!
+  video_dislike: Int!
+  video_privacy: String!
+  video_premium: Boolean!
+  video_restriction: Boolean!
+  video_thumbnail: String!
   video: String!
-  channelId: Int!
-  videoViews: Int!
-  videoRegion: String!
+  channel_id: Int!
+  video_views: Int!
+  video_region: String!
   day: Int!
   month: Int!
   year: Int!
@@ -375,32 +361,35 @@ type Video{
 
 type Query{
   videos: [Video!]!
+  getVideo: [Video!]!
 }
 
 input newVideo{
-  videoTitle: String!
-  videoDescription: String!
-  videoCategory: String!
-  videoLike: Int!
-  videoDislike: Int!
-  videoPrivacy: String!
-  videoPremium: Boolean!
-  videoRestriction: Boolean!
-  videoThumbnail: String!
+  video_title: String!
+  video_description: String!
+  video_category: String!
+  video_like: Int!
+  video_dislike: Int!
+  video_privacy: String!
+  video_premium: Boolean!
+  video_restriction: Boolean!
+  video_thumbnail: String!
   video: String!
-  channelId: Int!
-  videoViews: Int!
-  videoRegion: String!
+  channel_id: Int!
+  video_views: Int!
+  video_region: String!
   day: Int!
   month: Int!
   year: Int!
 }
 
 
+
+
 type Mutation{
   createVideo (input: newVideo): Video!
-  updateVideo (videoId: ID!, input: newVideo): Video!
-  deleteVideo (videoId: ID!): Boolean!
+  updateVideo (video_id: ID!, input: newVideo): Video!
+  deleteVideo (video_id: ID!): Boolean!
 }
 
 
@@ -430,13 +419,13 @@ func (ec *executionContext) field_Mutation_deleteVideo_args(ctx context.Context,
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["videoId"]; ok {
+	if tmp, ok := rawArgs["video_id"]; ok {
 		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["videoId"] = arg0
+	args["video_id"] = arg0
 	return args, nil
 }
 
@@ -444,13 +433,13 @@ func (ec *executionContext) field_Mutation_updateVideo_args(ctx context.Context,
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["videoId"]; ok {
+	if tmp, ok := rawArgs["video_id"]; ok {
 		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["videoId"] = arg0
+	args["video_id"] = arg0
 	var arg1 *model.NewVideo
 	if tmp, ok := rawArgs["input"]; ok {
 		arg1, err = ec.unmarshalOnewVideo2ᚖback_endᚋgraphᚋmodelᚐNewVideo(ctx, tmp)
@@ -577,7 +566,7 @@ func (ec *executionContext) _Mutation_updateVideo(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateVideo(rctx, args["videoId"].(string), args["input"].(*model.NewVideo))
+		return ec.resolvers.Mutation().UpdateVideo(rctx, args["video_id"].(string), args["input"].(*model.NewVideo))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -618,7 +607,7 @@ func (ec *executionContext) _Mutation_deleteVideo(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteVideo(rctx, args["videoId"].(string))
+		return ec.resolvers.Mutation().DeleteVideo(rctx, args["video_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -653,6 +642,40 @@ func (ec *executionContext) _Query_videos(ctx context.Context, field graphql.Col
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Videos(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetVideo(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -738,7 +761,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoId(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_id(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -772,7 +795,7 @@ func (ec *executionContext) _Video_videoId(ctx context.Context, field graphql.Co
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoTitle(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_title(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -806,7 +829,7 @@ func (ec *executionContext) _Video_videoTitle(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoDescription(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_description(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -840,7 +863,7 @@ func (ec *executionContext) _Video_videoDescription(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoCategory(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_category(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -874,7 +897,7 @@ func (ec *executionContext) _Video_videoCategory(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoLike(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_like(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -908,7 +931,7 @@ func (ec *executionContext) _Video_videoLike(ctx context.Context, field graphql.
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoDislike(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_dislike(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -942,7 +965,7 @@ func (ec *executionContext) _Video_videoDislike(ctx context.Context, field graph
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoPrivacy(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_privacy(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -976,7 +999,7 @@ func (ec *executionContext) _Video_videoPrivacy(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoPremium(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_premium(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1010,7 +1033,7 @@ func (ec *executionContext) _Video_videoPremium(ctx context.Context, field graph
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoRestriction(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_restriction(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1044,7 +1067,7 @@ func (ec *executionContext) _Video_videoRestriction(ctx context.Context, field g
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoThumbnail(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1112,7 +1135,7 @@ func (ec *executionContext) _Video_video(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_channelId(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_channel_id(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1146,7 +1169,7 @@ func (ec *executionContext) _Video_channelId(ctx context.Context, field graphql.
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoViews(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_views(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1180,7 +1203,7 @@ func (ec *executionContext) _Video_videoViews(ctx context.Context, field graphql
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Video_videoRegion(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+func (ec *executionContext) _Video_video_region(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2377,55 +2400,55 @@ func (ec *executionContext) unmarshalInputnewVideo(ctx context.Context, obj inte
 
 	for k, v := range asMap {
 		switch k {
-		case "videoTitle":
+		case "video_title":
 			var err error
 			it.VideoTitle, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoDescription":
+		case "video_description":
 			var err error
 			it.VideoDescription, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoCategory":
+		case "video_category":
 			var err error
 			it.VideoCategory, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoLike":
+		case "video_like":
 			var err error
 			it.VideoLike, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoDislike":
+		case "video_dislike":
 			var err error
 			it.VideoDislike, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoPrivacy":
+		case "video_privacy":
 			var err error
 			it.VideoPrivacy, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoPremium":
+		case "video_premium":
 			var err error
 			it.VideoPremium, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoRestriction":
+		case "video_restriction":
 			var err error
 			it.VideoRestriction, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoThumbnail":
+		case "video_thumbnail":
 			var err error
 			it.VideoThumbnail, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -2437,19 +2460,19 @@ func (ec *executionContext) unmarshalInputnewVideo(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "channelId":
+		case "channel_id":
 			var err error
 			it.ChannelID, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoViews":
+		case "video_views":
 			var err error
 			it.VideoViews, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "videoRegion":
+		case "video_region":
 			var err error
 			it.VideoRegion, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -2557,6 +2580,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "getVideo":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getVideo(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -2583,53 +2620,53 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Video")
-		case "videoId":
-			out.Values[i] = ec._Video_videoId(ctx, field, obj)
+		case "video_id":
+			out.Values[i] = ec._Video_video_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoTitle":
-			out.Values[i] = ec._Video_videoTitle(ctx, field, obj)
+		case "video_title":
+			out.Values[i] = ec._Video_video_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoDescription":
-			out.Values[i] = ec._Video_videoDescription(ctx, field, obj)
+		case "video_description":
+			out.Values[i] = ec._Video_video_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoCategory":
-			out.Values[i] = ec._Video_videoCategory(ctx, field, obj)
+		case "video_category":
+			out.Values[i] = ec._Video_video_category(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoLike":
-			out.Values[i] = ec._Video_videoLike(ctx, field, obj)
+		case "video_like":
+			out.Values[i] = ec._Video_video_like(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoDislike":
-			out.Values[i] = ec._Video_videoDislike(ctx, field, obj)
+		case "video_dislike":
+			out.Values[i] = ec._Video_video_dislike(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoPrivacy":
-			out.Values[i] = ec._Video_videoPrivacy(ctx, field, obj)
+		case "video_privacy":
+			out.Values[i] = ec._Video_video_privacy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoPremium":
-			out.Values[i] = ec._Video_videoPremium(ctx, field, obj)
+		case "video_premium":
+			out.Values[i] = ec._Video_video_premium(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoRestriction":
-			out.Values[i] = ec._Video_videoRestriction(ctx, field, obj)
+		case "video_restriction":
+			out.Values[i] = ec._Video_video_restriction(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoThumbnail":
-			out.Values[i] = ec._Video_videoThumbnail(ctx, field, obj)
+		case "video_thumbnail":
+			out.Values[i] = ec._Video_video_thumbnail(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2638,18 +2675,18 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "channelId":
-			out.Values[i] = ec._Video_channelId(ctx, field, obj)
+		case "channel_id":
+			out.Values[i] = ec._Video_channel_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoViews":
-			out.Values[i] = ec._Video_videoViews(ctx, field, obj)
+		case "video_views":
+			out.Values[i] = ec._Video_video_views(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "videoRegion":
-			out.Values[i] = ec._Video_videoRegion(ctx, field, obj)
+		case "video_region":
+			out.Values[i] = ec._Video_video_region(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

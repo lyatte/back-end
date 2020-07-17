@@ -2,46 +2,23 @@
 #
 # https://gqlgen.com/getting-started/
 #
-#type Todo {
-#  id: ID!
-#  text: String!
-#  done: Boolean!
-#  user: User!
-#}
-#
-#type User {
-#  id: ID!
-#  name: String!
-#}
-#
-#type Query {
-#  todos: [Todo!]!
-#}
-#
-#input NewTodo {
-#  text: String!
-#  userId: String!
-#}
-#
-#type Mutation {
-#  createTodo(input: NewTodo!): Todo!
-#}
+
 
 type Video{
-  videoId: ID!
-  videoTitle: String!
-  videoDescription: String!
-  videoCategory: String!
-  videoLike: Int!
-  videoDislike: Int!
-  videoPrivacy: String!
-  videoPremium: Boolean!
-  videoRestriction: Boolean!
-  videoThumbnail: String!
+  video_id: ID!
+  video_title: String!
+  video_description: String!
+  video_category: String!
+  video_like: Int!
+  video_dislike: Int!
+  video_privacy: String!
+  video_premium: Boolean!
+  video_restriction: Boolean!
+  video_thumbnail: String!
   video: String!
-  channelId: Int!
-  videoViews: Int!
-  videoRegion: String!
+  channel_id: Int!
+  video_views: Int!
+  video_region: String!
   day: Int!
   month: Int!
   year: Int!
@@ -49,32 +26,35 @@ type Video{
 
 type Query{
   videos: [Video!]!
+  getVideo: [Video!]!
 }
 
 input newVideo{
-  videoTitle: String!
-  videoDescription: String!
-  videoCategory: String!
-  videoLike: Int!
-  videoDislike: Int!
-  videoPrivacy: String!
-  videoPremium: Boolean!
-  videoRestriction: Boolean!
-  videoThumbnail: String!
+  video_title: String!
+  video_description: String!
+  video_category: String!
+  video_like: Int!
+  video_dislike: Int!
+  video_privacy: String!
+  video_premium: Boolean!
+  video_restriction: Boolean!
+  video_thumbnail: String!
   video: String!
-  channelId: Int!
-  videoViews: Int!
-  videoRegion: String!
+  channel_id: Int!
+  video_views: Int!
+  video_region: String!
   day: Int!
   month: Int!
   year: Int!
 }
 
 
+
+
 type Mutation{
   createVideo (input: newVideo): Video!
-  updateVideo (videoId: ID!, input: newVideo): Video!
-  deleteVideo (videoId: ID!): Boolean!
+  updateVideo (video_id: ID!, input: newVideo): Video!
+  deleteVideo (video_id: ID!): Boolean!
 }
 
 

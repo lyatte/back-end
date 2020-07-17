@@ -3,39 +3,39 @@
 package model
 
 type Video struct {
-	VideoID          string `json:"videoId"`
-	VideoTitle       string `json:"videoTitle"`
-	VideoDescription string `json:"videoDescription"`
-	VideoCategory    string `json:"videoCategory"`
-	VideoLike        int    `json:"videoLike"`
-	VideoDislike     int    `json:"videoDislike"`
-	VideoPrivacy     string `json:"videoPrivacy"`
-	VideoPremium     bool   `json:"videoPremium"`
-	VideoRestriction bool   `json:"videoRestriction"`
-	VideoThumbnail   string `json:"videoThumbnail"`
+	VideoID          string `json:"video_id"`
+	VideoTitle       string `json:"video_title"`
+	VideoDescription string `json:"video_description"`
+	VideoCategory    string `json:"video_category"`
+	VideoLike        int    `json:"video_like"`
+	VideoDislike     int    `json:"video_dislike"`
+	VideoPrivacy     string `json:"video_privacy"`
+	VideoPremium     bool   `json:"video_premium"`
+	VideoRestriction bool   `json:"video_restriction"`
+	VideoThumbnail   string `json:"video_thumbnail"`
 	Video            string `json:"video"`
-	ChannelID        int    `json:"channelId"`
-	VideoViews       int    `json:"videoViews"`
-	VideoRegion      string `json:"videoRegion"`
+	ChannelID        int    `json:"channel_id"`
+	VideoViews       int    `json:"video_views"`
+	VideoRegion      string `json:"video_region"`
 	Day              int    `json:"day"`
 	Month            int    `json:"month"`
 	Year             int    `json:"year"`
 }
 
 type NewVideo struct {
-	VideoTitle       string `json:"videoTitle"`
-	VideoDescription string `json:"videoDescription"`
-	VideoCategory    string `json:"videoCategory"`
-	VideoLike        int    `json:"videoLike"`
-	VideoDislike     int    `json:"videoDislike"`
-	VideoPrivacy     string `json:"videoPrivacy"`
-	VideoPremium     bool   `json:"videoPremium"`
-	VideoRestriction bool   `json:"videoRestriction"`
-	VideoThumbnail   string `json:"videoThumbnail"`
+	VideoTitle       string `json:"video_title"`
+	VideoDescription string `json:"video_description"`
+	VideoCategory    string `json:"video_category"`
+	VideoLike        int    `json:"video_like"`
+	VideoDislike     int    `json:"video_dislike"`
+	VideoPrivacy     string `json:"video_privacy"`
+	VideoPremium     bool   `json:"video_premium"`
+	VideoRestriction bool   `json:"video_restriction"`
+	VideoThumbnail   string `json:"video_thumbnail"`
 	Video            string `json:"video"`
-	ChannelID        int    `json:"channelId"`
-	VideoViews       int    `json:"videoViews"`
-	VideoRegion      string `json:"videoRegion"`
+	ChannelID        int    `json:"channel_id"`
+	VideoViews       int    `json:"video_views"`
+	VideoRegion      string `json:"video_region"`
 	Day              int    `json:"day"`
 	Month            int    `json:"month"`
 	Year             int    `json:"year"`
