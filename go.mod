@@ -1,6 +1,8 @@
 module back_end
+// +heroku goVersion go1.14
 
 go 1.14
+
 
 require (
 	github.com/99designs/gqlgen v0.11.3
