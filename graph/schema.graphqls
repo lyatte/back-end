@@ -27,6 +27,7 @@ type Video{
 type Query{
   videos: [Video!]!
   getVideo: [Video!]!
+  getVideoById(video_id: Int!): Video!
 }
 
 input newVideo{

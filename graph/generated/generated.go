@@ -50,8 +50,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetVideo func(childComplexity int) int
-		Videos   func(childComplexity int) int
+		GetVideo     func(childComplexity int) int
+		GetVideoByID func(childComplexity int, videoID int) int
+		Videos       func(childComplexity int) int
 	}
 
 	Video struct {
@@ -83,6 +84,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Videos(ctx context.Context) ([]*model.Video, error)
 	GetVideo(ctx context.Context) ([]*model.Video, error)
+	GetVideoByID(ctx context.Context, videoID int) (*model.Video, error)
 }
 
 type executableSchema struct {
@@ -142,6 +144,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetVideo(childComplexity), true
+
+	case "Query.getVideoById":
+		if e.complexity.Query.GetVideoByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getVideoById_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetVideoByID(childComplexity, args["video_id"].(int)), true
 
 	case "Query.videos":
 		if e.complexity.Query.Videos == nil {
@@ -362,6 +376,7 @@ type Video{
 type Query{
   videos: [Video!]!
   getVideo: [Video!]!
+  getVideoById(video_id: Int!): Video!
 }
 
 input newVideo{
@@ -462,6 +477,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getVideoById_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["video_id"]; ok {
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["video_id"] = arg0
 	return args, nil
 }
 
@@ -690,6 +719,47 @@ func (ec *executionContext) _Query_getVideo(ctx context.Context, field graphql.C
 	res := resTmp.([]*model.Video)
 	fc.Result = res
 	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getVideoById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getVideoById_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetVideoByID(rctx, args["video_id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚖback_endᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2589,6 +2659,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getVideo(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getVideoById":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getVideoById(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

@@ -68,6 +68,19 @@ func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
 	return videos, nil
 }
 
+func (r *queryResolver) GetVideoByID(ctx context.Context, videoID int) (*model.Video, error) {
+	var video model.Video
+
+	err := r.DB.Model(&video).Where("video_id = ?", videoID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return &video, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
