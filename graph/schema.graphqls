@@ -85,6 +85,7 @@ type Mutation{
   createChannel (input: newChannel): Channel!
   updateChannel (channel_id: ID!, input: newChannel): Channel!
   deleteChannel (channel_id: ID!): Boolean!
+  addVideoViews (video_id: ID!): Boolean!
 }
 
 

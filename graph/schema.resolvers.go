@@ -30,8 +30,8 @@ func (r *mutationResolver) CreateVideo(ctx context.Context, input *model.NewVide
 		Day:              input.Day,
 		Month:            input.Month,
 		Year:             input.Year,
-		ChannelName: input.ChannelName,
-		ChannelIcon: input.ChannelIcon,
+		ChannelName:      input.ChannelName,
+		ChannelIcon:      input.ChannelIcon,
 	}
 
 	_, err := r.DB.Model(&video).Insert()
@@ -82,6 +82,21 @@ func (r *mutationResolver) UpdateChannel(ctx context.Context, channelID string, 
 
 func (r *mutationResolver) DeleteChannel(ctx context.Context, channelID string) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddVideoViews(ctx context.Context, videoID string) (bool, error) {
+	var video model.Video
+
+	err := r.DB.Model(&video).Where("video_id = ?", videoID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Query failed")
+	}
+
+	video.VideoViews += 1
+
+	return true, nil
 }
 
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {

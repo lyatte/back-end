@@ -56,6 +56,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AddVideoViews func(childComplexity int, videoID string) int
 		CreateChannel func(childComplexity int, input *model.NewChannel) int
 		CreateVideo   func(childComplexity int, input *model.NewVideo) int
 		DeleteChannel func(childComplexity int, channelID string) int
@@ -101,6 +102,7 @@ type MutationResolver interface {
 	CreateChannel(ctx context.Context, input *model.NewChannel) (*model.Channel, error)
 	UpdateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error)
 	DeleteChannel(ctx context.Context, channelID string) (bool, error)
+	AddVideoViews(ctx context.Context, videoID string) (bool, error)
 }
 type QueryResolver interface {
 	GetVideo(ctx context.Context) ([]*model.Video, error)
@@ -186,6 +188,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Channel.ChannelSubscribers(childComplexity), true
+
+	case "Mutation.addVideoViews":
+		if e.complexity.Mutation.AddVideoViews == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addVideoViews_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddVideoViews(childComplexity, args["video_id"].(string)), true
 
 	case "Mutation.createChannel":
 		if e.complexity.Mutation.CreateChannel == nil {
@@ -581,6 +595,7 @@ type Mutation{
   createChannel (input: newChannel): Channel!
   updateChannel (channel_id: ID!, input: newChannel): Channel!
   deleteChannel (channel_id: ID!): Boolean!
+  addVideoViews (video_id: ID!): Boolean!
 }
 
 
@@ -591,6 +606,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addVideoViews_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["video_id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["video_id"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1306,6 +1335,47 @@ func (ec *executionContext) _Mutation_deleteChannel(ctx context.Context, field g
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteChannel(rctx, args["channel_id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addVideoViews(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addVideoViews_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddVideoViews(rctx, args["video_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3539,6 +3609,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "deleteChannel":
 			out.Values[i] = ec._Mutation_deleteChannel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addVideoViews":
+			out.Values[i] = ec._Mutation_addVideoViews(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
