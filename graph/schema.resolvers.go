@@ -51,7 +51,35 @@ func (r *mutationResolver) DeleteVideo(ctx context.Context, videoID string) (boo
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
+func (r *mutationResolver) CreateChannel(ctx context.Context, input *model.NewChannel) (*model.Channel, error) {
+	channel := model.Channel{
+		ChannelID:       input.ChannelID,
+		ChannelName: input.ChannelName,
+		ChannelBackground:    input.ChannelBackground,
+		ChannelIcon:        input.ChannelIcon,
+		ChannelSubscibers:     input.ChannelSubscibers,
+		ChannelDescription:     input.ChannelDescription,
+		ChannelJoinDateDay: input.ChannelJoinDateDay,
+		ChannelJoinDateMonth: input.ChannelJoinDateMonth,
+		ChannelJoinDateYear: input.ChannelJoinDateYear,
+	}
+
+	_, err := r.DB.Model(&channel).Insert()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Insert failed!")
+	} else {
+		log.Println("Insert success!")
+		return &channel, nil
+	}
+}
+
+func (r *mutationResolver) UpdateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteChannel(ctx context.Context, channelID string) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -81,6 +109,19 @@ func (r *queryResolver) GetVideoByID(ctx context.Context, videoID int) (*model.V
 	return &video, nil
 }
 
+func (r *queryResolver) GetChannelByID(ctx context.Context, channelID int) (*model.Channel, error) {
+	var channel model.Channel
+
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return &channel, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -89,3 +130,13 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
+	panic(fmt.Errorf("not implemented"))
+}

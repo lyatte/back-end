@@ -2,6 +2,18 @@
 
 package model
 
+type Channel struct {
+	ChannelID            string `json:"channel_id"`
+	ChannelName          string `json:"channel_name"`
+	ChannelBackground    string `json:"channel_background"`
+	ChannelIcon          string `json:"channel_icon"`
+	ChannelSubscibers    int    `json:"channel_subscibers"`
+	ChannelDescription   string `json:"channel_description"`
+	ChannelJoinDateDay   int    `json:"channel_join_date_day"`
+	ChannelJoinDateMonth int    `json:"channel_join_date_month"`
+	ChannelJoinDateYear  int    `json:"channel_join_date_year"`
+}
+
 type Video struct {
 	VideoID          string `json:"video_id"`
 	VideoTitle       string `json:"video_title"`
@@ -14,12 +26,24 @@ type Video struct {
 	VideoRestriction bool   `json:"video_restriction"`
 	VideoThumbnail   string `json:"video_thumbnail"`
 	Video            string `json:"video"`
-	ChannelID        int    `json:"channel_id"`
 	VideoViews       int    `json:"video_views"`
 	VideoRegion      string `json:"video_region"`
 	Day              int    `json:"day"`
 	Month            int    `json:"month"`
 	Year             int    `json:"year"`
+	ChannelID        int    `json:"channel_id"`
+}
+
+type NewChannel struct {
+	ChannelID            string `json:"channel_id"`
+	ChannelName          string `json:"channel_name"`
+	ChannelBackground    string `json:"channel_background"`
+	ChannelIcon          string `json:"channel_icon"`
+	ChannelSubscibers    int    `json:"channel_subscibers"`
+	ChannelDescription   string `json:"channel_description"`
+	ChannelJoinDateDay   int    `json:"channel_join_date_day"`
+	ChannelJoinDateMonth int    `json:"channel_join_date_month"`
+	ChannelJoinDateYear  int    `json:"channel_join_date_year"`
 }
 
 type NewVideo struct {
@@ -33,10 +57,10 @@ type NewVideo struct {
 	VideoRestriction bool   `json:"video_restriction"`
 	VideoThumbnail   string `json:"video_thumbnail"`
 	Video            string `json:"video"`
-	ChannelID        int    `json:"channel_id"`
 	VideoViews       int    `json:"video_views"`
 	VideoRegion      string `json:"video_region"`
 	Day              int    `json:"day"`
 	Month            int    `json:"month"`
 	Year             int    `json:"year"`
+	ChannelID        int    `json:"channel_id"`
 }

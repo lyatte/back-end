@@ -16,18 +16,30 @@ type Video{
   video_restriction: Boolean!
   video_thumbnail: String!
   video: String!
-  channel_id: Int!
   video_views: Int!
   video_region: String!
   day: Int!
   month: Int!
   year: Int!
+  channel_id: Int!
+}
+
+type Channel{
+  channel_id: ID!
+  channel_name: String!
+  channel_background: String!
+  channel_icon: String!
+  channel_subscibers: Int!
+  channel_description: String!
+  channel_join_date_day: Int!
+  channel_join_date_month: Int!
+  channel_join_date_year: Int!
 }
 
 type Query{
-  videos: [Video!]!
   getVideo: [Video!]!
   getVideoById(video_id: Int!): Video!
+  getChannelById(channel_id: Int!): Channel!
 }
 
 input newVideo{
@@ -41,21 +53,34 @@ input newVideo{
   video_restriction: Boolean!
   video_thumbnail: String!
   video: String!
-  channel_id: Int!
   video_views: Int!
   video_region: String!
   day: Int!
   month: Int!
   year: Int!
+  channel_id: Int!
 }
 
-
+input newChannel{
+  channel_id: ID!
+  channel_name: String!
+  channel_background: String!
+  channel_icon: String!
+  channel_subscibers: Int!
+  channel_description: String!
+  channel_join_date_day: Int!
+  channel_join_date_month: Int!
+  channel_join_date_year: Int!
+}
 
 
 type Mutation{
   createVideo (input: newVideo): Video!
   updateVideo (video_id: ID!, input: newVideo): Video!
   deleteVideo (video_id: ID!): Boolean!
+  createChannel (input: newChannel): Channel!
+  updateChannel (channel_id: ID!, input: newChannel): Channel!
+  deleteChannel (channel_id: ID!): Boolean!
 }
 
 
