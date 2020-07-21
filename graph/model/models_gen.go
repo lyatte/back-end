@@ -35,7 +35,6 @@ type Video struct {
 }
 
 type NewChannel struct {
-	ChannelID            string `json:"channel_id"`
 	ChannelName          string `json:"channel_name"`
 	ChannelBackground    string `json:"channel_background"`
 	ChannelIcon          string `json:"channel_icon"`

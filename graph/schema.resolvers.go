@@ -53,15 +53,14 @@ func (r *mutationResolver) DeleteVideo(ctx context.Context, videoID string) (boo
 
 func (r *mutationResolver) CreateChannel(ctx context.Context, input *model.NewChannel) (*model.Channel, error) {
 	channel := model.Channel{
-		ChannelID:       input.ChannelID,
-		ChannelName: input.ChannelName,
+		ChannelName:          input.ChannelName,
 		ChannelBackground:    input.ChannelBackground,
-		ChannelIcon:        input.ChannelIcon,
-		ChannelSubscibers:     input.ChannelSubscibers,
-		ChannelDescription:     input.ChannelDescription,
-		ChannelJoinDateDay: input.ChannelJoinDateDay,
+		ChannelIcon:          input.ChannelIcon,
+		ChannelSubscibers:    input.ChannelSubscibers,
+		ChannelDescription:   input.ChannelDescription,
+		ChannelJoinDateDay:   input.ChannelJoinDateDay,
 		ChannelJoinDateMonth: input.ChannelJoinDateMonth,
-		ChannelJoinDateYear: input.ChannelJoinDateYear,
+		ChannelJoinDateYear:  input.ChannelJoinDateYear,
 	}
 
 	_, err := r.DB.Model(&channel).Insert()

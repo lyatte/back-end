@@ -533,7 +533,6 @@ input newVideo{
 }
 
 input newChannel{
-  channel_id: ID!
   channel_name: String!
   channel_background: String!
   channel_icon: String!
@@ -3117,12 +3116,6 @@ func (ec *executionContext) unmarshalInputnewChannel(ctx context.Context, obj in
 
 	for k, v := range asMap {
 		switch k {
-		case "channel_id":
-			var err error
-			it.ChannelID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "channel_name":
 			var err error
 			it.ChannelName, err = ec.unmarshalNString2string(ctx, v)

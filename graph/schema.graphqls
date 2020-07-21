@@ -62,7 +62,6 @@ input newVideo{
 }
 
 input newChannel{
-  channel_id: ID!
   channel_name: String!
   channel_background: String!
   channel_icon: String!
