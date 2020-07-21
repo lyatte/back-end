@@ -67,7 +67,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetChannel     func(childComplexity int) int
-		GetChannelByID func(childComplexity int, channelID int) int
+		GetChannelByID func(childComplexity int, channelID string) int
 		GetVideo       func(childComplexity int) int
 		GetVideoByID   func(childComplexity int, videoID int) int
 	}
@@ -108,7 +108,7 @@ type QueryResolver interface {
 	GetVideo(ctx context.Context) ([]*model.Video, error)
 	GetVideoByID(ctx context.Context, videoID int) (*model.Video, error)
 	GetChannel(ctx context.Context) ([]*model.Channel, error)
-	GetChannelByID(ctx context.Context, channelID int) (*model.Channel, error)
+	GetChannelByID(ctx context.Context, channelID string) (*model.Channel, error)
 }
 
 type executableSchema struct {
@@ -290,7 +290,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetChannelByID(childComplexity, args["channel_id"].(int)), true
+		return e.complexity.Query.GetChannelByID(childComplexity, args["channel_id"].(string)), true
 
 	case "Query.getVideo":
 		if e.complexity.Query.GetVideo == nil {
@@ -531,13 +531,13 @@ type Video{
   day: Int!
   month: Int!
   year: Int!
-  channel_id: Int!
+  channel_id: String!
   channel_name: String!
   channel_icon: String!
 }
 
 type Channel{
-  channel_id: ID!
+  channel_id: String!
   channel_name: String!
   channel_background: String!
   channel_icon: String!
@@ -552,7 +552,7 @@ type Query{
   getVideo: [Video!]!
   getVideoById(video_id: Int!): Video!
   getChannel: [Channel!]!
-  getChannelById(channel_id: Int!): Channel!
+  getChannelById(channel_id: String!): Channel!
 }
 
 input newVideo{
@@ -571,12 +571,13 @@ input newVideo{
   day: Int!
   month: Int!
   year: Int!
-  channel_id: Int!
+  channel_id: String!
   channel_name: String!
   channel_icon: String!
 }
 
 input newChannel{
+  channel_id: String!
   channel_name: String!
   channel_background: String!
   channel_icon: String!
@@ -593,8 +594,8 @@ type Mutation{
   updateVideo (video_id: ID!, input: newVideo): Video!
   deleteVideo (video_id: ID!): Boolean!
   createChannel (input: newChannel): Channel!
-  updateChannel (channel_id: ID!, input: newChannel): Channel!
-  deleteChannel (channel_id: ID!): Boolean!
+  updateChannel (channel_id: String!, input: newChannel): Channel!
+  deleteChannel (channel_id: String!): Boolean!
   addVideoViews (video_id: ID!): Boolean!
 }
 
@@ -654,7 +655,7 @@ func (ec *executionContext) field_Mutation_deleteChannel_args(ctx context.Contex
 	args := map[string]interface{}{}
 	var arg0 string
 	if tmp, ok := rawArgs["channel_id"]; ok {
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -682,7 +683,7 @@ func (ec *executionContext) field_Mutation_updateChannel_args(ctx context.Contex
 	args := map[string]interface{}{}
 	var arg0 string
 	if tmp, ok := rawArgs["channel_id"]; ok {
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -738,9 +739,9 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_getChannelById_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 string
 	if tmp, ok := rawArgs["channel_id"]; ok {
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -830,7 +831,7 @@ func (ec *executionContext) _Channel_channel_id(ctx context.Context, field graph
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Channel_channel_name(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
@@ -1525,7 +1526,7 @@ func (ec *executionContext) _Query_getChannelById(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetChannelByID(rctx, args["channel_id"].(int))
+		return ec.resolvers.Query().GetChannelByID(rctx, args["channel_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2184,9 +2185,9 @@ func (ec *executionContext) _Video_channel_id(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Video_channel_name(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
@@ -3318,6 +3319,12 @@ func (ec *executionContext) unmarshalInputnewChannel(ctx context.Context, obj in
 
 	for k, v := range asMap {
 		switch k {
+		case "channel_id":
+			var err error
+			it.ChannelID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "channel_name":
 			var err error
 			it.ChannelName, err = ec.unmarshalNString2string(ctx, v)
@@ -3470,7 +3477,7 @@ func (ec *executionContext) unmarshalInputnewVideo(ctx context.Context, obj inte
 			}
 		case "channel_id":
 			var err error
-			it.ChannelID, err = ec.unmarshalNInt2int(ctx, v)
+			it.ChannelID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

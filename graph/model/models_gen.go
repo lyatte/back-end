@@ -31,12 +31,13 @@ type Video struct {
 	Day              int    `json:"day"`
 	Month            int    `json:"month"`
 	Year             int    `json:"year"`
-	ChannelID        int    `json:"channel_id"`
+	ChannelID        string `json:"channel_id"`
 	ChannelName      string `json:"channel_name"`
 	ChannelIcon      string `json:"channel_icon"`
 }
 
 type NewChannel struct {
+	ChannelID            string `json:"channel_id"`
 	ChannelName          string `json:"channel_name"`
 	ChannelBackground    string `json:"channel_background"`
 	ChannelIcon          string `json:"channel_icon"`
@@ -63,7 +64,7 @@ type NewVideo struct {
 	Day              int    `json:"day"`
 	Month            int    `json:"month"`
 	Year             int    `json:"year"`
-	ChannelID        int    `json:"channel_id"`
+	ChannelID        string `json:"channel_id"`
 	ChannelName      string `json:"channel_name"`
 	ChannelIcon      string `json:"channel_icon"`
 }

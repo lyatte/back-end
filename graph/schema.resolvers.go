@@ -55,6 +55,7 @@ func (r *mutationResolver) DeleteVideo(ctx context.Context, videoID string) (boo
 
 func (r *mutationResolver) CreateChannel(ctx context.Context, input *model.NewChannel) (*model.Channel, error) {
 	channel := model.Channel{
+		ChannelID:            input.ChannelID,
 		ChannelName:          input.ChannelName,
 		ChannelBackground:    input.ChannelBackground,
 		ChannelIcon:          input.ChannelIcon,
@@ -138,7 +139,7 @@ func (r *queryResolver) GetChannel(ctx context.Context) ([]*model.Channel, error
 	return channels, nil
 }
 
-func (r *queryResolver) GetChannelByID(ctx context.Context, channelID int) (*model.Channel, error) {
+func (r *queryResolver) GetChannelByID(ctx context.Context, channelID string) (*model.Channel, error) {
 	var channel model.Channel
 
 	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
