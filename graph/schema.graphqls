@@ -21,13 +21,13 @@ type Video{
   day: Int!
   month: Int!
   year: Int!
-  channel_id: Int!
+  channel_id: String!
   channel_name: String!
   channel_icon: String!
 }
 
 type Channel{
-  channel_id: ID!
+  channel_id: String!
   channel_name: String!
   channel_background: String!
   channel_icon: String!
@@ -61,12 +61,13 @@ input newVideo{
   day: Int!
   month: Int!
   year: Int!
-  channel_id: Int!
+  channel_id: String!
   channel_name: String!
   channel_icon: String!
 }
 
 input newChannel{
+  channel_id: String!
   channel_name: String!
   channel_background: String!
   channel_icon: String!
@@ -83,8 +84,8 @@ type Mutation{
   updateVideo (video_id: ID!, input: newVideo): Video!
   deleteVideo (video_id: ID!): Boolean!
   createChannel (input: newChannel): Channel!
-  updateChannel (channel_id: ID!, input: newChannel): Channel!
-  deleteChannel (channel_id: ID!): Boolean!
+  updateChannel (channel_id: String!, input: newChannel): Channel!
+  deleteChannel (channel_id: String!): Boolean!
   addVideoViews (video_id: ID!): Boolean!
 }
 
