@@ -65,6 +65,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		GetChannel     func(childComplexity int) int
 		GetChannelByID func(childComplexity int, channelID int) int
 		GetVideo       func(childComplexity int) int
 		GetVideoByID   func(childComplexity int, videoID int) int
@@ -102,6 +103,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	GetVideo(ctx context.Context) ([]*model.Video, error)
 	GetVideoByID(ctx context.Context, videoID int) (*model.Video, error)
+	GetChannel(ctx context.Context) ([]*model.Channel, error)
 	GetChannelByID(ctx context.Context, channelID int) (*model.Channel, error)
 }
 
@@ -254,6 +256,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateVideo(childComplexity, args["video_id"].(string), args["input"].(*model.NewVideo)), true
+
+	case "Query.getChannel":
+		if e.complexity.Query.GetChannel == nil {
+			break
+		}
+
+		return e.complexity.Query.GetChannel(childComplexity), true
 
 	case "Query.getChannelById":
 		if e.complexity.Query.GetChannelByID == nil {
@@ -510,6 +519,7 @@ type Channel{
 type Query{
   getVideo: [Video!]!
   getVideoById(video_id: Int!): Video!
+  getChannel: [Channel!]!
   getChannelById(channel_id: Int!): Channel!
 }
 
@@ -1365,6 +1375,40 @@ func (ec *executionContext) _Query_getVideoById(ctx context.Context, field graph
 	res := resTmp.(*model.Video)
 	fc.Result = res
 	return ec.marshalNVideo2ᚖback_endᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getChannel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetChannel(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Channel)
+	fc.Result = res
+	return ec.marshalNChannel2ᚕᚖback_endᚋgraphᚋmodelᚐChannelᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getChannelById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3452,6 +3496,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "getChannel":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getChannel(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "getChannelById":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3849,6 +3907,43 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 
 func (ec *executionContext) marshalNChannel2back_endᚋgraphᚋmodelᚐChannel(ctx context.Context, sel ast.SelectionSet, v model.Channel) graphql.Marshaler {
 	return ec._Channel(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNChannel2ᚕᚖback_endᚋgraphᚋmodelᚐChannelᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Channel) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNChannel2ᚖback_endᚋgraphᚋmodelᚐChannel(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalNChannel2ᚖback_endᚋgraphᚋmodelᚐChannel(ctx context.Context, sel ast.SelectionSet, v *model.Channel) graphql.Marshaler {

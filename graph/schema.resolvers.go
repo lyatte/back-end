@@ -108,6 +108,19 @@ func (r *queryResolver) GetVideoByID(ctx context.Context, videoID int) (*model.V
 	return &video, nil
 }
 
+func (r *queryResolver) GetChannel(ctx context.Context) ([]*model.Channel, error) {
+	var channels []*model.Channel
+
+	err := r.DB.Model(&channels).Order("channel_id").Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed.")
+	}
+
+	return channels, nil
+}
+
 func (r *queryResolver) GetChannelByID(ctx context.Context, channelID int) (*model.Channel, error) {
 	var channel model.Channel
 
