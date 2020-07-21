@@ -56,7 +56,7 @@ func (r *mutationResolver) CreateChannel(ctx context.Context, input *model.NewCh
 		ChannelName:          input.ChannelName,
 		ChannelBackground:    input.ChannelBackground,
 		ChannelIcon:          input.ChannelIcon,
-		ChannelSubscibers:    input.ChannelSubscibers,
+		ChannelSubscribers:   input.ChannelSubscribers,
 		ChannelDescription:   input.ChannelDescription,
 		ChannelJoinDateDay:   input.ChannelJoinDateDay,
 		ChannelJoinDateMonth: input.ChannelJoinDateMonth,

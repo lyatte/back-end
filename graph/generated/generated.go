@@ -52,7 +52,7 @@ type ComplexityRoot struct {
 		ChannelJoinDateMonth func(childComplexity int) int
 		ChannelJoinDateYear  func(childComplexity int) int
 		ChannelName          func(childComplexity int) int
-		ChannelSubscibers    func(childComplexity int) int
+		ChannelSubscribers   func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -176,12 +176,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Channel.ChannelName(childComplexity), true
 
-	case "Channel.channel_subscibers":
-		if e.complexity.Channel.ChannelSubscibers == nil {
+	case "Channel.channel_subscribers":
+		if e.complexity.Channel.ChannelSubscribers == nil {
 			break
 		}
 
-		return e.complexity.Channel.ChannelSubscibers(childComplexity), true
+		return e.complexity.Channel.ChannelSubscribers(childComplexity), true
 
 	case "Mutation.createChannel":
 		if e.complexity.Mutation.CreateChannel == nil {
@@ -500,7 +500,7 @@ type Channel{
   channel_name: String!
   channel_background: String!
   channel_icon: String!
-  channel_subscibers: Int!
+  channel_subscribers: Int!
   channel_description: String!
   channel_join_date_day: Int!
   channel_join_date_month: Int!
@@ -536,7 +536,7 @@ input newChannel{
   channel_name: String!
   channel_background: String!
   channel_icon: String!
-  channel_subscibers: Int!
+  channel_subscribers: Int!
   channel_description: String!
   channel_join_date_day: Int!
   channel_join_date_month: Int!
@@ -876,7 +876,7 @@ func (ec *executionContext) _Channel_channel_icon(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Channel_channel_subscibers(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+func (ec *executionContext) _Channel_channel_subscribers(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -893,7 +893,7 @@ func (ec *executionContext) _Channel_channel_subscibers(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ChannelSubscibers, nil
+		return obj.ChannelSubscribers, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3134,9 +3134,9 @@ func (ec *executionContext) unmarshalInputnewChannel(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "channel_subscibers":
+		case "channel_subscribers":
 			var err error
-			it.ChannelSubscibers, err = ec.unmarshalNInt2int(ctx, v)
+			it.ChannelSubscribers, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3317,8 +3317,8 @@ func (ec *executionContext) _Channel(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "channel_subscibers":
-			out.Values[i] = ec._Channel_channel_subscibers(ctx, field, obj)
+		case "channel_subscribers":
+			out.Values[i] = ec._Channel_channel_subscribers(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

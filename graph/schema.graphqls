@@ -29,7 +29,7 @@ type Channel{
   channel_name: String!
   channel_background: String!
   channel_icon: String!
-  channel_subscibers: Int!
+  channel_subscribers: Int!
   channel_description: String!
   channel_join_date_day: Int!
   channel_join_date_month: Int!
@@ -65,7 +65,7 @@ input newChannel{
   channel_name: String!
   channel_background: String!
   channel_icon: String!
-  channel_subscibers: Int!
+  channel_subscribers: Int!
   channel_description: String!
   channel_join_date_day: Int!
   channel_join_date_month: Int!

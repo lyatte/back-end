@@ -7,7 +7,7 @@ type Channel struct {
 	ChannelName          string `json:"channel_name"`
 	ChannelBackground    string `json:"channel_background"`
 	ChannelIcon          string `json:"channel_icon"`
-	ChannelSubscibers    int    `json:"channel_subscibers"`
+	ChannelSubscribers   int    `json:"channel_subscribers"`
 	ChannelDescription   string `json:"channel_description"`
 	ChannelJoinDateDay   int    `json:"channel_join_date_day"`
 	ChannelJoinDateMonth int    `json:"channel_join_date_month"`
@@ -38,7 +38,7 @@ type NewChannel struct {
 	ChannelName          string `json:"channel_name"`
 	ChannelBackground    string `json:"channel_background"`
 	ChannelIcon          string `json:"channel_icon"`
-	ChannelSubscibers    int    `json:"channel_subscibers"`
+	ChannelSubscribers   int    `json:"channel_subscribers"`
 	ChannelDescription   string `json:"channel_description"`
 	ChannelJoinDateDay   int    `json:"channel_join_date_day"`
 	ChannelJoinDateMonth int    `json:"channel_join_date_month"`
