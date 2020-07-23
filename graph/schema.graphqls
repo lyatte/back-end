@@ -48,8 +48,9 @@ type Channel{
 type Query{
   getVideo: [Video!]!
   getVideoById(video_id: Int!): Video!
-  getChannel: [Channel!]!
+  getChannel(channel_id: String!): [Channel!]!
   getChannelById(channel_id: String!): Channel!
+  getVideoByCategory(video_category: String!): [Channel!]!
 }
 
 input newVideo{
