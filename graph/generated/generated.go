@@ -44,15 +44,22 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Channel struct {
-		ChannelBackground    func(childComplexity int) int
-		ChannelDescription   func(childComplexity int) int
-		ChannelID            func(childComplexity int) int
-		ChannelIcon          func(childComplexity int) int
-		ChannelJoinDateDay   func(childComplexity int) int
-		ChannelJoinDateMonth func(childComplexity int) int
-		ChannelJoinDateYear  func(childComplexity int) int
-		ChannelName          func(childComplexity int) int
-		ChannelSubscribers   func(childComplexity int) int
+		ChannelBackground      func(childComplexity int) int
+		ChannelDescription     func(childComplexity int) int
+		ChannelDislikedComment func(childComplexity int) int
+		ChannelDislikedPost    func(childComplexity int) int
+		ChannelDislikedVideo   func(childComplexity int) int
+		ChannelID              func(childComplexity int) int
+		ChannelIcon            func(childComplexity int) int
+		ChannelJoinDateDay     func(childComplexity int) int
+		ChannelJoinDateMonth   func(childComplexity int) int
+		ChannelJoinDateYear    func(childComplexity int) int
+		ChannelLikedComment    func(childComplexity int) int
+		ChannelLikedPost       func(childComplexity int) int
+		ChannelLikedVideo      func(childComplexity int) int
+		ChannelName            func(childComplexity int) int
+		ChannelPremium         func(childComplexity int) int
+		ChannelSubscribers     func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -140,6 +147,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Channel.ChannelDescription(childComplexity), true
 
+	case "Channel.channel_disliked_comment":
+		if e.complexity.Channel.ChannelDislikedComment == nil {
+			break
+		}
+
+		return e.complexity.Channel.ChannelDislikedComment(childComplexity), true
+
+	case "Channel.channel_disliked_post":
+		if e.complexity.Channel.ChannelDislikedPost == nil {
+			break
+		}
+
+		return e.complexity.Channel.ChannelDislikedPost(childComplexity), true
+
+	case "Channel.channel_disliked_video":
+		if e.complexity.Channel.ChannelDislikedVideo == nil {
+			break
+		}
+
+		return e.complexity.Channel.ChannelDislikedVideo(childComplexity), true
+
 	case "Channel.channel_id":
 		if e.complexity.Channel.ChannelID == nil {
 			break
@@ -175,12 +203,40 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Channel.ChannelJoinDateYear(childComplexity), true
 
+	case "Channel.channel_liked_comment":
+		if e.complexity.Channel.ChannelLikedComment == nil {
+			break
+		}
+
+		return e.complexity.Channel.ChannelLikedComment(childComplexity), true
+
+	case "Channel.channel_liked_post":
+		if e.complexity.Channel.ChannelLikedPost == nil {
+			break
+		}
+
+		return e.complexity.Channel.ChannelLikedPost(childComplexity), true
+
+	case "Channel.channel_liked_video":
+		if e.complexity.Channel.ChannelLikedVideo == nil {
+			break
+		}
+
+		return e.complexity.Channel.ChannelLikedVideo(childComplexity), true
+
 	case "Channel.channel_name":
 		if e.complexity.Channel.ChannelName == nil {
 			break
 		}
 
 		return e.complexity.Channel.ChannelName(childComplexity), true
+
+	case "Channel.channel_premium":
+		if e.complexity.Channel.ChannelPremium == nil {
+			break
+		}
+
+		return e.complexity.Channel.ChannelPremium(childComplexity), true
 
 	case "Channel.channel_subscribers":
 		if e.complexity.Channel.ChannelSubscribers == nil {
@@ -546,6 +602,13 @@ type Channel{
   channel_join_date_day: Int!
   channel_join_date_month: Int!
   channel_join_date_year: Int!
+  channel_liked_video: String!
+  channel_disliked_video: String!
+  channel_liked_post: String!
+  channel_disliked_post: String!
+  channel_liked_comment: String!
+  channel_disliked_comment: String!
+  channel_premium: String!
 }
 
 type Query{
@@ -586,6 +649,13 @@ input newChannel{
   channel_join_date_day: Int!
   channel_join_date_month: Int!
   channel_join_date_year: Int!
+  channel_liked_video: String!
+  channel_disliked_video: String!
+  channel_liked_post: String!
+  channel_disliked_post: String!
+  channel_liked_comment: String!
+  channel_disliked_comment: String!
+  channel_premium: String!
 }
 
 
@@ -1112,6 +1182,244 @@ func (ec *executionContext) _Channel_channel_join_date_year(ctx context.Context,
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_channel_liked_video(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelLikedVideo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_channel_disliked_video(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelDislikedVideo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_channel_liked_post(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelLikedPost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_channel_disliked_post(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelDislikedPost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_channel_liked_comment(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelLikedComment, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_channel_disliked_comment(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelDislikedComment, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_channel_premium(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelPremium, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3381,6 +3689,48 @@ func (ec *executionContext) unmarshalInputnewChannel(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "channel_liked_video":
+			var err error
+			it.ChannelLikedVideo, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "channel_disliked_video":
+			var err error
+			it.ChannelDislikedVideo, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "channel_liked_post":
+			var err error
+			it.ChannelLikedPost, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "channel_disliked_post":
+			var err error
+			it.ChannelDislikedPost, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "channel_liked_comment":
+			var err error
+			it.ChannelLikedComment, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "channel_disliked_comment":
+			var err error
+			it.ChannelDislikedComment, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "channel_premium":
+			var err error
+			it.ChannelPremium, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -3568,6 +3918,41 @@ func (ec *executionContext) _Channel(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "channel_join_date_year":
 			out.Values[i] = ec._Channel_channel_join_date_year(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "channel_liked_video":
+			out.Values[i] = ec._Channel_channel_liked_video(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "channel_disliked_video":
+			out.Values[i] = ec._Channel_channel_disliked_video(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "channel_liked_post":
+			out.Values[i] = ec._Channel_channel_liked_post(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "channel_disliked_post":
+			out.Values[i] = ec._Channel_channel_disliked_post(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "channel_liked_comment":
+			out.Values[i] = ec._Channel_channel_liked_comment(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "channel_disliked_comment":
+			out.Values[i] = ec._Channel_channel_disliked_comment(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "channel_premium":
+			out.Values[i] = ec._Channel_channel_premium(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

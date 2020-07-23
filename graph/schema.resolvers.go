@@ -54,14 +54,13 @@ func (r *mutationResolver) DeleteVideo(ctx context.Context, videoID string) (boo
 }
 
 func (r *mutationResolver) CreateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error) {
-
-	var ch model.Channel;
+	var ch model.Channel
 
 	error := r.DB.Model(&ch).Where("channel_id = ?", channelID).Select()
 
 	if error != nil {
 		log.Println("ID still not registered!")
-	} else{
+	} else {
 		return nil, errors.New("ID already valid!")
 	}
 

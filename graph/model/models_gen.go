@@ -3,15 +3,22 @@
 package model
 
 type Channel struct {
-	ChannelID            string `json:"channel_id"`
-	ChannelName          string `json:"channel_name"`
-	ChannelBackground    string `json:"channel_background"`
-	ChannelIcon          string `json:"channel_icon"`
-	ChannelSubscribers   int    `json:"channel_subscribers"`
-	ChannelDescription   string `json:"channel_description"`
-	ChannelJoinDateDay   int    `json:"channel_join_date_day"`
-	ChannelJoinDateMonth int    `json:"channel_join_date_month"`
-	ChannelJoinDateYear  int    `json:"channel_join_date_year"`
+	ChannelID              string `json:"channel_id"`
+	ChannelName            string `json:"channel_name"`
+	ChannelBackground      string `json:"channel_background"`
+	ChannelIcon            string `json:"channel_icon"`
+	ChannelSubscribers     int    `json:"channel_subscribers"`
+	ChannelDescription     string `json:"channel_description"`
+	ChannelJoinDateDay     int    `json:"channel_join_date_day"`
+	ChannelJoinDateMonth   int    `json:"channel_join_date_month"`
+	ChannelJoinDateYear    int    `json:"channel_join_date_year"`
+	ChannelLikedVideo      string `json:"channel_liked_video"`
+	ChannelDislikedVideo   string `json:"channel_disliked_video"`
+	ChannelLikedPost       string `json:"channel_liked_post"`
+	ChannelDislikedPost    string `json:"channel_disliked_post"`
+	ChannelLikedComment    string `json:"channel_liked_comment"`
+	ChannelDislikedComment string `json:"channel_disliked_comment"`
+	ChannelPremium         string `json:"channel_premium"`
 }
 
 type Video struct {
@@ -37,15 +44,22 @@ type Video struct {
 }
 
 type NewChannel struct {
-	ChannelID            string `json:"channel_id"`
-	ChannelName          string `json:"channel_name"`
-	ChannelBackground    string `json:"channel_background"`
-	ChannelIcon          string `json:"channel_icon"`
-	ChannelSubscribers   int    `json:"channel_subscribers"`
-	ChannelDescription   string `json:"channel_description"`
-	ChannelJoinDateDay   int    `json:"channel_join_date_day"`
-	ChannelJoinDateMonth int    `json:"channel_join_date_month"`
-	ChannelJoinDateYear  int    `json:"channel_join_date_year"`
+	ChannelID              string `json:"channel_id"`
+	ChannelName            string `json:"channel_name"`
+	ChannelBackground      string `json:"channel_background"`
+	ChannelIcon            string `json:"channel_icon"`
+	ChannelSubscribers     int    `json:"channel_subscribers"`
+	ChannelDescription     string `json:"channel_description"`
+	ChannelJoinDateDay     int    `json:"channel_join_date_day"`
+	ChannelJoinDateMonth   int    `json:"channel_join_date_month"`
+	ChannelJoinDateYear    int    `json:"channel_join_date_year"`
+	ChannelLikedVideo      string `json:"channel_liked_video"`
+	ChannelDislikedVideo   string `json:"channel_disliked_video"`
+	ChannelLikedPost       string `json:"channel_liked_post"`
+	ChannelDislikedPost    string `json:"channel_disliked_post"`
+	ChannelLikedComment    string `json:"channel_liked_comment"`
+	ChannelDislikedComment string `json:"channel_disliked_comment"`
+	ChannelPremium         string `json:"channel_premium"`
 }
 
 type NewVideo struct {
