@@ -53,7 +53,18 @@ func (r *mutationResolver) DeleteVideo(ctx context.Context, videoID string) (boo
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreateChannel(ctx context.Context, input *model.NewChannel) (*model.Channel, error) {
+func (r *mutationResolver) CreateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error) {
+
+	var ch model.Channel;
+
+	error := r.DB.Model(&ch).Where("channel_id = ?", channelID).Select()
+
+	if error != nil {
+		log.Println("ID still not registered!")
+	} else{
+		return nil, errors.New("ID already valid!")
+	}
+
 	channel := model.Channel{
 		ChannelID:            input.ChannelID,
 		ChannelName:          input.ChannelName,

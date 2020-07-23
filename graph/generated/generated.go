@@ -57,7 +57,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddVideoViews func(childComplexity int, videoID string) int
-		CreateChannel func(childComplexity int, input *model.NewChannel) int
+		CreateChannel func(childComplexity int, channelID string, input *model.NewChannel) int
 		CreateVideo   func(childComplexity int, input *model.NewVideo) int
 		DeleteChannel func(childComplexity int, channelID string) int
 		DeleteVideo   func(childComplexity int, videoID string) int
@@ -99,7 +99,7 @@ type MutationResolver interface {
 	CreateVideo(ctx context.Context, input *model.NewVideo) (*model.Video, error)
 	UpdateVideo(ctx context.Context, videoID string, input *model.NewVideo) (*model.Video, error)
 	DeleteVideo(ctx context.Context, videoID string) (bool, error)
-	CreateChannel(ctx context.Context, input *model.NewChannel) (*model.Channel, error)
+	CreateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error)
 	UpdateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error)
 	DeleteChannel(ctx context.Context, channelID string) (bool, error)
 	AddVideoViews(ctx context.Context, videoID string) (bool, error)
@@ -211,7 +211,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateChannel(childComplexity, args["input"].(*model.NewChannel)), true
+		return e.complexity.Mutation.CreateChannel(childComplexity, args["channel_id"].(string), args["input"].(*model.NewChannel)), true
 
 	case "Mutation.createVideo":
 		if e.complexity.Mutation.CreateVideo == nil {
@@ -593,7 +593,7 @@ type Mutation{
   createVideo (input: newVideo): Video!
   updateVideo (video_id: ID!, input: newVideo): Video!
   deleteVideo (video_id: ID!): Boolean!
-  createChannel (input: newChannel): Channel!
+  createChannel (channel_id: String!, input: newChannel): Channel!
   updateChannel (channel_id: String!, input: newChannel): Channel!
   deleteChannel (channel_id: String!): Boolean!
   addVideoViews (video_id: ID!): Boolean!
@@ -625,14 +625,22 @@ func (ec *executionContext) field_Mutation_addVideoViews_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_createChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.NewChannel
-	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalOnewChannel2ᚖback_endᚋgraphᚋmodelᚐNewChannel(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg0
+	args["channel_id"] = arg0
+	var arg1 *model.NewChannel
+	if tmp, ok := rawArgs["input"]; ok {
+		arg1, err = ec.unmarshalOnewChannel2ᚖback_endᚋgraphᚋmodelᚐNewChannel(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -1253,7 +1261,7 @@ func (ec *executionContext) _Mutation_createChannel(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateChannel(rctx, args["input"].(*model.NewChannel))
+		return ec.resolvers.Mutation().CreateChannel(rctx, args["channel_id"].(string), args["input"].(*model.NewChannel))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

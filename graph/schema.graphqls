@@ -36,6 +36,13 @@ type Channel{
   channel_join_date_day: Int!
   channel_join_date_month: Int!
   channel_join_date_year: Int!
+  channel_liked_video: String!
+  channel_disliked_video: String!
+  channel_liked_post: String!
+  channel_disliked_post: String!
+  channel_liked_comment: String!
+  channel_disliked_comment: String!
+  channel_premium: String!
 }
 
 type Query{
@@ -76,6 +83,13 @@ input newChannel{
   channel_join_date_day: Int!
   channel_join_date_month: Int!
   channel_join_date_year: Int!
+  channel_liked_video: String!
+  channel_disliked_video: String!
+  channel_liked_post: String!
+  channel_disliked_post: String!
+  channel_liked_comment: String!
+  channel_disliked_comment: String!
+  channel_premium: String!
 }
 
 
@@ -83,7 +97,7 @@ type Mutation{
   createVideo (input: newVideo): Video!
   updateVideo (video_id: ID!, input: newVideo): Video!
   deleteVideo (video_id: ID!): Boolean!
-  createChannel (input: newChannel): Channel!
+  createChannel (channel_id: String!, input: newChannel): Channel!
   updateChannel (channel_id: String!, input: newChannel): Channel!
   deleteChannel (channel_id: String!): Boolean!
   addVideoViews (video_id: ID!): Boolean!
