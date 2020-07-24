@@ -296,7 +296,16 @@ func (r *queryResolver) GetChannelByID(ctx context.Context, channelID string) (*
 }
 
 func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error) {
-	panic(fmt.Errorf("not implemented"))
+	var playlists []*model.Playlist
+
+	err := r.DB.Model(&playlists).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return playlists, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
