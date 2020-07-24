@@ -198,17 +198,16 @@ func (r *mutationResolver) DeleteChannel(ctx context.Context, channelID string) 
 }
 
 func (r *mutationResolver) CreatePlaylist(ctx context.Context, input *model.NewPlaylist) (*model.Playlist, error) {
-
 	playlist := model.Playlist{
-		ChannelID:            input.ChannelID,
+		ChannelID:          input.ChannelID,
 		PlaylistTitle:      input.PlaylistTitle,
-		PlaylistDay:            input.PlaylistDay,
+		PlaylistDay:        input.PlaylistDay,
 		PlaylistVisibility: input.PlaylistVisibility,
-		PlaylistMonth:     input.PlaylistMonth,
-		PlaylistYear:     input.PlaylistYear,
-		PlaylistViews:     input.PlaylistViews,
-		PlaylistVideos:   input.PlaylistVideos,
-		PlaylistDesc:    input.PlaylistDesc,
+		PlaylistMonth:      input.PlaylistMonth,
+		PlaylistYear:       input.PlaylistYear,
+		PlaylistViews:      input.PlaylistViews,
+		PlaylistVideos:     input.PlaylistVideos,
+		PlaylistDesc:       input.PlaylistDesc,
 	}
 
 	_, err := r.DB.Model(&playlist).Insert()
@@ -306,6 +305,19 @@ func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string
 	}
 
 	return playlists, nil
+}
+
+func (r *queryResolver) GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error) {
+	var playlist model.Playlist
+
+	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return &playlist, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

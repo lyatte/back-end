@@ -65,6 +65,7 @@ type Query{
   getChannel: [Channel!]!
   getChannelById(channel_id: String!): Channel!
   getChannelPlaylist(channel_id: String!): [Playlist!]!
+  getPlaylistById(playlist_id: ID!): Playlist!
 }
 
 input newPlaylist{
