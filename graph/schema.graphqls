@@ -102,6 +102,8 @@ type Mutation{
   updateChannel (channel_id: String!, input: newChannel): Channel!
   deleteChannel (channel_id: String!): Boolean!
   addVideoViews (video_id: ID!): Boolean!
+  addVideoLike (video_id: ID!): Boolean!
+  addVideoDislike (video_id: ID!): Boolean!
 }
 
 

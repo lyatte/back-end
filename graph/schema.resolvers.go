@@ -65,22 +65,22 @@ func (r *mutationResolver) CreateChannel(ctx context.Context, channelID string, 
 	}
 
 	channel := model.Channel{
-		ChannelID:            input.ChannelID,
-		ChannelName:          input.ChannelName,
-		ChannelBackground:    input.ChannelBackground,
-		ChannelIcon:          input.ChannelIcon,
-		ChannelSubscribers:   input.ChannelSubscribers,
-		ChannelDescription:   input.ChannelDescription,
-		ChannelJoinDateDay:   input.ChannelJoinDateDay,
-		ChannelJoinDateMonth: input.ChannelJoinDateMonth,
-		ChannelJoinDateYear:  input.ChannelJoinDateYear,
-		ChannelLikedVideo: input.ChannelLikedVideo,
-		ChannelDislikedVideo: input.ChannelDislikedVideo,
-		ChannelLikedPost: input.ChannelLikedPost,
-		ChannelDislikedPost: input.ChannelDislikedPost,
-		ChannelLikedComment: input.ChannelLikedComment,
+		ChannelID:              input.ChannelID,
+		ChannelName:            input.ChannelName,
+		ChannelBackground:      input.ChannelBackground,
+		ChannelIcon:            input.ChannelIcon,
+		ChannelSubscribers:     input.ChannelSubscribers,
+		ChannelDescription:     input.ChannelDescription,
+		ChannelJoinDateDay:     input.ChannelJoinDateDay,
+		ChannelJoinDateMonth:   input.ChannelJoinDateMonth,
+		ChannelJoinDateYear:    input.ChannelJoinDateYear,
+		ChannelLikedVideo:      input.ChannelLikedVideo,
+		ChannelDislikedVideo:   input.ChannelDislikedVideo,
+		ChannelLikedPost:       input.ChannelLikedPost,
+		ChannelDislikedPost:    input.ChannelDislikedPost,
+		ChannelLikedComment:    input.ChannelLikedComment,
 		ChannelDislikedComment: input.ChannelDislikedComment,
-		ChannelPremium: input.ChannelPremium,
+		ChannelPremium:         input.ChannelPremium,
 	}
 
 	_, err := r.DB.Model(&channel).Insert()
@@ -121,6 +121,14 @@ func (r *mutationResolver) AddVideoViews(ctx context.Context, videoID string) (b
 	}
 
 	return true, nil
+}
+
+func (r *mutationResolver) AddVideoLike(ctx context.Context, videoID string) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddVideoDislike(ctx context.Context, videoID string) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
