@@ -63,8 +63,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddVideoDislike func(childComplexity int, videoID string) int
-		AddVideoLike    func(childComplexity int, videoID string) int
+		AddVideoDislike func(childComplexity int, videoID string, channelID string) int
+		AddVideoLike    func(childComplexity int, videoID string, channelID string) int
 		AddVideoViews   func(childComplexity int, videoID string) int
 		CreateChannel   func(childComplexity int, channelID string, input *model.NewChannel) int
 		CreateVideo     func(childComplexity int, input *model.NewVideo) int
@@ -113,8 +113,8 @@ type MutationResolver interface {
 	UpdateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error)
 	DeleteChannel(ctx context.Context, channelID string) (bool, error)
 	AddVideoViews(ctx context.Context, videoID string) (bool, error)
-	AddVideoLike(ctx context.Context, videoID string) (bool, error)
-	AddVideoDislike(ctx context.Context, videoID string) (bool, error)
+	AddVideoLike(ctx context.Context, videoID string, channelID string) (bool, error)
+	AddVideoDislike(ctx context.Context, videoID string, channelID string) (bool, error)
 }
 type QueryResolver interface {
 	GetVideo(ctx context.Context) ([]*model.Video, error)
@@ -261,7 +261,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddVideoDislike(childComplexity, args["video_id"].(string)), true
+		return e.complexity.Mutation.AddVideoDislike(childComplexity, args["video_id"].(string), args["channel_id"].(string)), true
 
 	case "Mutation.addVideoLike":
 		if e.complexity.Mutation.AddVideoLike == nil {
@@ -273,7 +273,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddVideoLike(childComplexity, args["video_id"].(string)), true
+		return e.complexity.Mutation.AddVideoLike(childComplexity, args["video_id"].(string), args["channel_id"].(string)), true
 
 	case "Mutation.addVideoViews":
 		if e.complexity.Mutation.AddVideoViews == nil {
@@ -710,8 +710,8 @@ type Mutation{
   updateChannel (channel_id: String!, input: newChannel): Channel!
   deleteChannel (channel_id: String!): Boolean!
   addVideoViews (video_id: ID!): Boolean!
-  addVideoLike (video_id: ID!): Boolean!
-  addVideoDislike (video_id: ID!): Boolean!
+  addVideoLike (video_id: ID!, channel_id: String!): Boolean!
+  addVideoDislike (video_id: ID!, channel_id: String!): Boolean!
 }
 
 
@@ -734,6 +734,14 @@ func (ec *executionContext) field_Mutation_addVideoDislike_args(ctx context.Cont
 		}
 	}
 	args["video_id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channel_id"] = arg1
 	return args, nil
 }
 
@@ -748,6 +756,14 @@ func (ec *executionContext) field_Mutation_addVideoLike_args(ctx context.Context
 		}
 	}
 	args["video_id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channel_id"] = arg1
 	return args, nil
 }
 
@@ -1820,7 +1836,7 @@ func (ec *executionContext) _Mutation_addVideoLike(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddVideoLike(rctx, args["video_id"].(string))
+		return ec.resolvers.Mutation().AddVideoLike(rctx, args["video_id"].(string), args["channel_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1861,7 +1877,7 @@ func (ec *executionContext) _Mutation_addVideoDislike(ctx context.Context, field
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddVideoDislike(rctx, args["video_id"].(string))
+		return ec.resolvers.Mutation().AddVideoDislike(rctx, args["video_id"].(string), args["channel_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

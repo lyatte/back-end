@@ -117,18 +117,84 @@ func (r *mutationResolver) AddVideoViews(ctx context.Context, videoID string) (b
 	_, updateError := r.DB.Model(&video).Where("video_id = ?", videoID).Update()
 
 	if updateError != nil {
-		return false, errors.New("Update user failed")
+		return false, errors.New("Add Views failed")
 	}
 
 	return true, nil
 }
 
-func (r *mutationResolver) AddVideoLike(ctx context.Context, videoID string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) AddVideoLike(ctx context.Context, videoID string, channelID string) (bool, error) {
+	var video model.Video
+	var channel model.Channel
+
+	err := r.DB.Model(&video).Where("video_id = ?", videoID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Video isn't valid")
+	}
+
+	chErr := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if chErr != nil {
+		log.Println(chErr)
+		return false, errors.New("Channel isn't valid")
+	}
+
+	video.VideoLike += 1
+
+	channel.ChannelLikedVideo += videoID + ","
+
+	_, updateErrorV := r.DB.Model(&video).Where("video_id = ?", videoID).Update()
+
+	if updateErrorV != nil {
+		return false, errors.New("Add like failed")
+	}
+
+	_, updateErrorC := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateErrorC != nil {
+		return false, errors.New("update channel failed")
+	}
+
+	return true, nil
 }
 
-func (r *mutationResolver) AddVideoDislike(ctx context.Context, videoID string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) AddVideoDislike(ctx context.Context, videoID string, channelID string) (bool, error) {
+	var video model.Video
+	var channel model.Channel
+
+	err := r.DB.Model(&video).Where("video_id = ?", videoID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Video isn't valid")
+	}
+
+	chErr := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if chErr != nil {
+		log.Println(chErr)
+		return false, errors.New("Channel isn't valid")
+	}
+
+	video.VideoDislike += 1
+
+	channel.ChannelLikedVideo += videoID + ","
+
+	_, updateErrorV := r.DB.Model(&video).Where("video_id = ?", videoID).Update()
+
+	if updateErrorV != nil {
+		return false, errors.New("Add dislike failed")
+	}
+
+	_, updateErrorC := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateErrorC != nil {
+		return false, errors.New("update channel failed")
+	}
+
+	return true, nil
 }
 
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
