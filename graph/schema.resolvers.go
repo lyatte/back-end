@@ -53,55 +53,6 @@ func (r *mutationResolver) DeleteVideo(ctx context.Context, videoID string) (boo
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error) {
-	var ch model.Channel
-
-	error := r.DB.Model(&ch).Where("channel_id = ?", channelID).Select()
-
-	if error != nil {
-		log.Println("ID still not registered!")
-	} else {
-		return nil, errors.New("ID already valid!")
-	}
-
-	channel := model.Channel{
-		ChannelID:              input.ChannelID,
-		ChannelName:            input.ChannelName,
-		ChannelBackground:      input.ChannelBackground,
-		ChannelIcon:            input.ChannelIcon,
-		ChannelSubscribers:     input.ChannelSubscribers,
-		ChannelDescription:     input.ChannelDescription,
-		ChannelJoinDateDay:     input.ChannelJoinDateDay,
-		ChannelJoinDateMonth:   input.ChannelJoinDateMonth,
-		ChannelJoinDateYear:    input.ChannelJoinDateYear,
-		ChannelLikedVideo:      input.ChannelLikedVideo,
-		ChannelDislikedVideo:   input.ChannelDislikedVideo,
-		ChannelLikedPost:       input.ChannelLikedPost,
-		ChannelDislikedPost:    input.ChannelDislikedPost,
-		ChannelLikedComment:    input.ChannelLikedComment,
-		ChannelDislikedComment: input.ChannelDislikedComment,
-		ChannelPremium:         input.ChannelPremium,
-	}
-
-	_, err := r.DB.Model(&channel).Insert()
-
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("Insert failed!")
-	} else {
-		log.Println("Insert success!")
-		return &channel, nil
-	}
-}
-
-func (r *mutationResolver) UpdateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DeleteChannel(ctx context.Context, channelID string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *mutationResolver) AddVideoViews(ctx context.Context, videoID string) (bool, error) {
 	var video model.Video
 
@@ -197,6 +148,67 @@ func (r *mutationResolver) AddVideoDislike(ctx context.Context, videoID string, 
 	return true, nil
 }
 
+func (r *mutationResolver) CreateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error) {
+	var ch model.Channel
+
+	error := r.DB.Model(&ch).Where("channel_id = ?", channelID).Select()
+
+	if error != nil {
+		log.Println("ID still not registered!")
+	} else {
+		return nil, errors.New("ID already valid!")
+	}
+
+	channel := model.Channel{
+		ChannelID:              input.ChannelID,
+		ChannelName:            input.ChannelName,
+		ChannelBackground:      input.ChannelBackground,
+		ChannelIcon:            input.ChannelIcon,
+		ChannelSubscribers:     input.ChannelSubscribers,
+		ChannelDescription:     input.ChannelDescription,
+		ChannelJoinDateDay:     input.ChannelJoinDateDay,
+		ChannelJoinDateMonth:   input.ChannelJoinDateMonth,
+		ChannelJoinDateYear:    input.ChannelJoinDateYear,
+		ChannelLikedVideo:      input.ChannelLikedVideo,
+		ChannelDislikedVideo:   input.ChannelDislikedVideo,
+		ChannelLikedPost:       input.ChannelLikedPost,
+		ChannelDislikedPost:    input.ChannelDislikedPost,
+		ChannelLikedComment:    input.ChannelLikedComment,
+		ChannelDislikedComment: input.ChannelDislikedComment,
+		ChannelPremium:         input.ChannelPremium,
+	}
+
+	_, err := r.DB.Model(&channel).Insert()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Insert failed!")
+	} else {
+		log.Println("Insert success!")
+		return &channel, nil
+	}
+}
+
+func (r *mutationResolver) UpdateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteChannel(ctx context.Context, channelID string) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) CreatePlaylist(ctx context.Context, input *model.NewPlaylist) (*model.Playlist, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdatePlaylist(ctx context.Context, playlistID string, input *model.NewPlaylist) (*model.Playlist, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeletePlaylist(ctx context.Context, playlistID string) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
 	var videos []*model.Video
 
@@ -260,6 +272,10 @@ func (r *queryResolver) GetChannelByID(ctx context.Context, channelID string) (*
 	}
 
 	return &channel, nil
+}
+
+func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.

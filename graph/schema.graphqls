@@ -45,12 +45,38 @@ type Channel{
   channel_premium: String!
 }
 
+type Playlist{
+  playlist_id: ID!
+  channel_id: String!
+  playlist_title: String!
+  playlist_visibility: String!
+  playlist_day: Int!
+  playlist_month: Int!
+  playlist_year: Int!
+  playlist_views: Int!
+  playlist_videos: String!
+  playlist_desc: String!
+}
+
 type Query{
   getVideo: [Video!]!
   getVideoById(video_id: Int!): Video!
   getVideoByCategory(video_category: String!): [Video!]!
   getChannel: [Channel!]!
   getChannelById(channel_id: String!): Channel!
+  getChannelPlaylist(channel_id: String!): [Playlist!]!
+}
+
+input newPlaylist{
+  channel_id: String!
+  playlist_title: String!
+  playlist_visibility: String!
+  playlist_day: Int!
+  playlist_month: Int!
+  playlist_year: Int!
+  playlist_views: Int!
+  playlist_videos: String!
+  playlist_desc: String!
 }
 
 input newVideo{
@@ -98,12 +124,18 @@ type Mutation{
   createVideo (input: newVideo): Video!
   updateVideo (video_id: ID!, input: newVideo): Video!
   deleteVideo (video_id: ID!): Boolean!
-  createChannel (channel_id: String!, input: newChannel): Channel!
-  updateChannel (channel_id: String!, input: newChannel): Channel!
-  deleteChannel (channel_id: String!): Boolean!
   addVideoViews (video_id: ID!): Boolean!
   addVideoLike (video_id: ID!, channel_id: String!): Boolean!
   addVideoDislike (video_id: ID!, channel_id: String!): Boolean!
+
+  createChannel (channel_id: String!, input: newChannel): Channel!
+  updateChannel (channel_id: String!, input: newChannel): Channel!
+  deleteChannel (channel_id: String!): Boolean!
+
+  createPlaylist (input: newPlaylist): Playlist!
+  updatePlaylist (playlist_id: ID!, input: newPlaylist): Playlist!
+  deletePlaylist (playlist_id: ID!): Boolean!
+
 }
 
 

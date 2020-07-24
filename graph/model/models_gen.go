@@ -21,6 +21,19 @@ type Channel struct {
 	ChannelPremium         string `json:"channel_premium"`
 }
 
+type Playlist struct {
+	PlaylistID         string `json:"playlist_id"`
+	ChannelID          string `json:"channel_id"`
+	PlaylistTitle      string `json:"playlist_title"`
+	PlaylistVisibility string `json:"playlist_visibility"`
+	PlaylistDay        int    `json:"playlist_day"`
+	PlaylistMonth      int    `json:"playlist_month"`
+	PlaylistYear       int    `json:"playlist_year"`
+	PlaylistViews      int    `json:"playlist_views"`
+	PlaylistVideos     string `json:"playlist_videos"`
+	PlaylistDesc       string `json:"playlist_desc"`
+}
+
 type Video struct {
 	VideoID          string `json:"video_id"`
 	VideoTitle       string `json:"video_title"`
@@ -60,6 +73,18 @@ type NewChannel struct {
 	ChannelLikedComment    string `json:"channel_liked_comment"`
 	ChannelDislikedComment string `json:"channel_disliked_comment"`
 	ChannelPremium         string `json:"channel_premium"`
+}
+
+type NewPlaylist struct {
+	ChannelID          string `json:"channel_id"`
+	PlaylistTitle      string `json:"playlist_title"`
+	PlaylistVisibility string `json:"playlist_visibility"`
+	PlaylistDay        int    `json:"playlist_day"`
+	PlaylistMonth      int    `json:"playlist_month"`
+	PlaylistYear       int    `json:"playlist_year"`
+	PlaylistViews      int    `json:"playlist_views"`
+	PlaylistVideos     string `json:"playlist_videos"`
+	PlaylistDesc       string `json:"playlist_desc"`
 }
 
 type NewVideo struct {
