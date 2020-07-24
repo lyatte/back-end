@@ -230,7 +230,32 @@ func (r *mutationResolver) DeletePlaylist(ctx context.Context, playlistID string
 }
 
 func (r *mutationResolver) AddVideoToPlaylist(ctx context.Context, playlistID string, videoID string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	var playlist model.Playlist
+	var video model.Video
+
+	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Playlist isn't valid")
+	}
+
+	vErr := r.DB.Model(&video).Where("video_id = ?", videoID).Select()
+
+	if vErr != nil {
+		log.Println(vErr)
+		return false, errors.New("Video isn't valid")
+	}
+
+	playlist.PlaylistVideos += videoID + ","
+
+	_, updateErrorV := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Update()
+
+	if updateErrorV != nil {
+		return false, errors.New("Add video to playlist failed")
+	}
+
+	return true, nil
 }
 
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
