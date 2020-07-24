@@ -203,6 +203,7 @@ func (r *mutationResolver) CreatePlaylist(ctx context.Context, input *model.NewP
 		ChannelID:            input.ChannelID,
 		PlaylistTitle:      input.PlaylistTitle,
 		PlaylistDay:            input.PlaylistDay,
+		PlaylistVisibility: input.PlaylistVisibility,
 		PlaylistMonth:     input.PlaylistMonth,
 		PlaylistYear:     input.PlaylistYear,
 		PlaylistViews:     input.PlaylistViews,
