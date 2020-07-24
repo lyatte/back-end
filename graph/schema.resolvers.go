@@ -198,7 +198,27 @@ func (r *mutationResolver) DeleteChannel(ctx context.Context, channelID string) 
 }
 
 func (r *mutationResolver) CreatePlaylist(ctx context.Context, input *model.NewPlaylist) (*model.Playlist, error) {
-	panic(fmt.Errorf("not implemented"))
+
+	playlist := model.Playlist{
+		ChannelID:            input.ChannelID,
+		PlaylistTitle:      input.PlaylistTitle,
+		PlaylistDay:            input.PlaylistDay,
+		PlaylistMonth:     input.PlaylistMonth,
+		PlaylistYear:     input.PlaylistYear,
+		PlaylistViews:     input.PlaylistViews,
+		PlaylistVideos:   input.PlaylistVideos,
+		PlaylistDesc:    input.PlaylistDesc,
+	}
+
+	_, err := r.DB.Model(&playlist).Insert()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Insert failed!")
+	} else {
+		log.Println("Insert success!")
+		return &playlist, nil
+	}
 }
 
 func (r *mutationResolver) UpdatePlaylist(ctx context.Context, playlistID string, input *model.NewPlaylist) (*model.Playlist, error) {
