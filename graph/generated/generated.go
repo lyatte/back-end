@@ -63,6 +63,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AddPlaylistViews   func(childComplexity int, playlistID string) int
 		AddVideoDislike    func(childComplexity int, videoID string, channelID string) int
 		AddVideoLike       func(childComplexity int, videoID string, channelID string) int
 		AddVideoToPlaylist func(childComplexity int, playlistID string, videoID string) int
@@ -138,6 +139,7 @@ type MutationResolver interface {
 	UpdatePlaylist(ctx context.Context, playlistID string, input *model.NewPlaylist) (*model.Playlist, error)
 	DeletePlaylist(ctx context.Context, playlistID string) (bool, error)
 	AddVideoToPlaylist(ctx context.Context, playlistID string, videoID string) (bool, error)
+	AddPlaylistViews(ctx context.Context, playlistID string) (bool, error)
 }
 type QueryResolver interface {
 	GetVideo(ctx context.Context) ([]*model.Video, error)
@@ -275,6 +277,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Channel.ChannelSubscribers(childComplexity), true
+
+	case "Mutation.addPlaylistViews":
+		if e.complexity.Mutation.AddPlaylistViews == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addPlaylistViews_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddPlaylistViews(childComplexity, args["playlist_id"].(string)), true
 
 	case "Mutation.addVideoDislike":
 		if e.complexity.Mutation.AddVideoDislike == nil {
@@ -912,6 +926,7 @@ type Mutation{
   updatePlaylist (playlist_id: ID!, input: newPlaylist): Playlist!
   deletePlaylist (playlist_id: ID!): Boolean!
   addVideoToPlaylist (playlist_id: ID!, video_id: ID!): Boolean!
+  addPlaylistViews (playlist_id: ID!): Boolean!
 
 }
 
@@ -923,6 +938,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addPlaylistViews_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["playlist_id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["playlist_id"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_addVideoDislike_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -2343,6 +2372,47 @@ func (ec *executionContext) _Mutation_addVideoToPlaylist(ctx context.Context, fi
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().AddVideoToPlaylist(rctx, args["playlist_id"].(string), args["video_id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addPlaylistViews(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addPlaylistViews_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddPlaylistViews(rctx, args["playlist_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5223,6 +5293,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "addVideoToPlaylist":
 			out.Values[i] = ec._Mutation_addVideoToPlaylist(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addPlaylistViews":
+			out.Values[i] = ec._Mutation_addPlaylistViews(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

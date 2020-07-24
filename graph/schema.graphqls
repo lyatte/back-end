@@ -137,6 +137,7 @@ type Mutation{
   updatePlaylist (playlist_id: ID!, input: newPlaylist): Playlist!
   deletePlaylist (playlist_id: ID!): Boolean!
   addVideoToPlaylist (playlist_id: ID!, video_id: ID!): Boolean!
+  addPlaylistViews (playlist_id: ID!): Boolean!
 
 }
 

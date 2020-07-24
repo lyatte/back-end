@@ -265,6 +265,27 @@ func (r *mutationResolver) AddVideoToPlaylist(ctx context.Context, playlistID st
 	return true, nil
 }
 
+func (r *mutationResolver) AddPlaylistViews(ctx context.Context, playlistID string) (bool, error) {
+	var playlist model.Playlist
+
+	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Playlist isn't valid")
+	}
+
+	playlist.PlaylistViews += 1
+
+	_, updateError := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Update()
+
+	if updateError != nil {
+		return false, errors.New("Add Views failed")
+	}
+
+	return true, nil
+}
+
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
 	var videos []*model.Video
 
