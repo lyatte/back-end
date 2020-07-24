@@ -74,6 +74,13 @@ func (r *mutationResolver) CreateChannel(ctx context.Context, channelID string, 
 		ChannelJoinDateDay:   input.ChannelJoinDateDay,
 		ChannelJoinDateMonth: input.ChannelJoinDateMonth,
 		ChannelJoinDateYear:  input.ChannelJoinDateYear,
+		ChannelLikedVideo: input.ChannelLikedVideo,
+		ChannelDislikedVideo: input.ChannelDislikedVideo,
+		ChannelLikedPost: input.ChannelLikedPost,
+		ChannelDislikedPost: input.ChannelDislikedPost,
+		ChannelLikedComment: input.ChannelLikedComment,
+		ChannelDislikedComment: input.ChannelDislikedComment,
+		ChannelPremium: input.ChannelPremium,
 	}
 
 	_, err := r.DB.Model(&channel).Insert()
