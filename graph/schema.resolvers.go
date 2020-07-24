@@ -136,7 +136,20 @@ func (r *queryResolver) GetVideoByID(ctx context.Context, videoID int) (*model.V
 	return &video, nil
 }
 
-func (r *queryResolver) GetChannel(ctx context.Context, channelID string) ([]*model.Channel, error) {
+func (r *queryResolver) GetVideoByCategory(ctx context.Context, videoCategory string) ([]*model.Video, error) {
+	var videos []*model.Video
+
+	err := r.DB.Model(&videos).Where("video_category = ?", videoCategory).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return videos, nil
+}
+
+func (r *queryResolver) GetChannel(ctx context.Context) ([]*model.Channel, error) {
 	var channels []*model.Channel
 
 	err := r.DB.Model(&channels).Order("channel_id").Select()
@@ -160,10 +173,6 @@ func (r *queryResolver) GetChannelByID(ctx context.Context, channelID string) (*
 	}
 
 	return &channel, nil
-}
-
-func (r *queryResolver) GetVideoByCategory(ctx context.Context, videoCategory string) ([]*model.Channel, error) {
-	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.
