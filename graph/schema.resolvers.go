@@ -109,10 +109,16 @@ func (r *mutationResolver) AddVideoViews(ctx context.Context, videoID string) (b
 
 	if err != nil {
 		log.Println(err)
-		return false, errors.New("Query failed")
+		return false, errors.New("Video isn't valid")
 	}
 
 	video.VideoViews += 1
+
+	_, updateError := r.DB.Model(&video).Where("video_id = ?", videoID).Update()
+
+	if updateError != nil {
+		return false, errors.New("Update user failed")
+	}
 
 	return true, nil
 }
