@@ -229,6 +229,10 @@ func (r *mutationResolver) DeletePlaylist(ctx context.Context, playlistID string
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddVideoToPlaylist(ctx context.Context, playlistID string, videoID string) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
 	var videos []*model.Video
 
