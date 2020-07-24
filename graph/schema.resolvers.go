@@ -180,7 +180,7 @@ func (r *mutationResolver) AddVideoDislike(ctx context.Context, videoID string, 
 
 	video.VideoDislike += 1
 
-	channel.ChannelLikedVideo += videoID + ","
+	channel.ChannelDislikedVideo += videoID + ","
 
 	_, updateErrorV := r.DB.Model(&video).Where("video_id = ?", videoID).Update()
 
