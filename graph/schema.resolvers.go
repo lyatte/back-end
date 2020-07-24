@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 )
 
 func (r *mutationResolver) CreateVideo(ctx context.Context, input *model.NewVideo) (*model.Video, error) {
@@ -248,6 +249,12 @@ func (r *mutationResolver) AddVideoToPlaylist(ctx context.Context, playlistID st
 	}
 
 	playlist.PlaylistVideos += videoID + ","
+
+	dt := time.Now()
+
+	playlist.PlaylistDay = dt.Day()
+	playlist.PlaylistMonth = int(dt.Month())
+	playlist.PlaylistYear = dt.Year()
 
 	_, updateErrorV := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Update()
 
