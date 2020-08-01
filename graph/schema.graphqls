@@ -58,6 +58,21 @@ type Playlist{
   playlist_desc: String!
 }
 
+type Comment{
+  comment_id: ID!
+  channel_id: String!
+  like: Int!
+  dislike: Int!
+  reply_to: Int!
+  content: String!
+  reply_count: Int!
+  video_id: Int!
+  post_id: Int!
+  day: Int!
+  month: Int!
+  year: Int!
+}
+
 type Query{
   getVideo: [Video!]!
   getVideoById(video_id: Int!): Video!
