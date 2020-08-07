@@ -463,15 +463,34 @@ func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string) ([
 
 func (r *queryResolver) GetVideoByLocation(ctx context.Context, location string) ([]*model.Video, error) {
 	var video []*model.Video
+	var video2 []*model.Video
 
-	err := r.DB.Model(&video).Where("video_region = ?", location).Select()
+
+	//video, err ;= r.DB.Query("SELECT * FROM videos WHERE ")
+
+	err := r.DB.Model(&video).Where("video_region != ?", location).Select()
 
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("Query failed")
 	}
 
-	return video, nil
+	err2 := r.DB.Model(&video2).Where("video_region = ?", location).Select()
+
+	if err2 != nil {
+		log.Println(err2)
+		return nil, errors.New("Query failed")
+	}
+
+	log.Println(video, video2)
+
+	for index, _ := range video {
+		video2 = append(video2, video[index])
+	}
+
+
+
+	return video2, nil
 }
 
 func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error) {

@@ -24,7 +24,7 @@ func main() {
 	//	Database: "YouRJube",
 	//})
 
-	opt, err := pg.ParseURL("postgres://cqopwwkufacewc:cb14826403fb985606175b5376e9a74d5082277d9c34dcbe290c127eb9b0fd69@ec2-50-16-198-4.compute-1.amazonaws.com:5432/ddipcc3o4af2rn")
+	opt, err := pg.ParseURL("postgres://xnqdobykbqsrfe:6cfbe0542f2041481f6e6428e0b9be3036693b5b2e5989f564570abf36365ab9@ec2-34-192-122-0.compute-1.amazonaws.com:5432/d5barvhj7isg76")
 	if err != nil {
 		panic(err)
 	}
