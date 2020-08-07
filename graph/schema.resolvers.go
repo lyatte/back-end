@@ -478,7 +478,7 @@ func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction s
 	var video []*model.Video
 	var video2 []*model.Video
 
-	err := r.DB.Model(&video).Where("video_restriction = ?", restriction).Select()
+	err := r.DB.Model(&video).Where("video_restriction = ?", "No").Select()
 
 	if err != nil {
 		log.Println(err)
