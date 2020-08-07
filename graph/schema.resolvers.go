@@ -286,6 +286,77 @@ func (r *mutationResolver) AddPlaylistViews(ctx context.Context, playlistID stri
 	return true, nil
 }
 
+func (r *mutationResolver) CreateComment(ctx context.Context, input *model.NewComment) (*model.Comment, error) {
+	comment := model.Comment{
+		ChannelID:          input.ChannelID,
+		Like: input.Like,
+		Dislike: input.Dislike,
+		ReplyTo: input.ReplyTo,
+		Content: input.Content,
+		ReplyCount: input.ReplyCount,
+		VideoID: input.VideoID,
+		PostID: input.PostID,
+		Day: input.Day,
+		Month: input.Month,
+		Year: input.Year,
+	}
+
+	_, err := r.DB.Model(&comment).Insert()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Insert failed!")
+	} else {
+		log.Println("Insert success!")
+		return &comment, nil
+	}
+}
+
+func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string, flag int) (bool, error) {
+	var comment model.Comment
+
+	err := r.DB.Model(&comment).Where("comment_id = ?", commentID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Comment isn't valid")
+	}
+
+	if flag == 1 {
+		comment.Like += 1
+	}else{
+		comment.Dislike += 1
+	}
+	_, updateError := r.DB.Model(&comment).Where("comment_id = ?", commentID).Update()
+
+	if updateError != nil {
+		return false, errors.New("Add Like/Dislike failed")
+	}
+
+	return true, nil
+}
+
+func (r *mutationResolver) UpdateCommentRc(ctx context.Context, commentID string) (bool, error) {
+	var comment model.Comment
+
+	err := r.DB.Model(&comment).Where("comment_id = ?", commentID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Comment isn't valid")
+	}
+
+	comment.ReplyCount += 1
+
+	_, updateError := r.DB.Model(&comment).Where("comment_id = ?", commentID).Update()
+
+	if updateError != nil {
+		return false, errors.New("Add Reply Count failed")
+	}
+
+	return true, nil
+}
+
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
 	var videos []*model.Video
 
@@ -375,6 +446,19 @@ func (r *queryResolver) GetPlaylistByID(ctx context.Context, playlistID string) 
 	}
 
 	return &playlist, nil
+}
+
+func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string) ([]*model.Comment, error) {
+	var comment []*model.Comment
+
+	err := r.DB.Model(&comment).Where("video_id = ?", videoID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return comment, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

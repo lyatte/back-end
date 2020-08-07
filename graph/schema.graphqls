@@ -81,6 +81,7 @@ type Query{
   getChannelById(channel_id: String!): Channel!
   getChannelPlaylist(channel_id: String!): [Playlist!]!
   getPlaylistById(playlist_id: ID!): Playlist!
+  getVideosComment(video_id: ID!): [Comment!]!
 }
 
 input newPlaylist{
@@ -135,6 +136,20 @@ input newChannel{
   channel_premium: String!
 }
 
+input newComment{
+  channel_id: String!
+  like: Int!
+  dislike: Int!
+  reply_to: Int!
+  content: String!
+  reply_count: Int!
+  video_id: Int!
+  post_id: Int!
+  day: Int!
+  month: Int!
+  year: Int!
+}
+
 
 type Mutation{
   createVideo (input: newVideo): Video!
@@ -153,6 +168,10 @@ type Mutation{
   deletePlaylist (playlist_id: ID!): Boolean!
   addVideoToPlaylist (playlist_id: ID!, video_id: ID!): Boolean!
   addPlaylistViews (playlist_id: ID!): Boolean!
+
+  createComment (input: newComment): Comment!
+  updateCommentDL (comment_id: ID!, flag: Int!): Boolean!
+  updateCommentRC (comment_id: ID!): Boolean!
 
 }
 

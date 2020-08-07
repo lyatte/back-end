@@ -21,6 +21,21 @@ type Channel struct {
 	ChannelPremium         string `json:"channel_premium"`
 }
 
+type Comment struct {
+	CommentID  string `json:"comment_id"`
+	ChannelID  string `json:"channel_id"`
+	Like       int    `json:"like"`
+	Dislike    int    `json:"dislike"`
+	ReplyTo    int    `json:"reply_to"`
+	Content    string `json:"content"`
+	ReplyCount int    `json:"reply_count"`
+	VideoID    int    `json:"video_id"`
+	PostID     int    `json:"post_id"`
+	Day        int    `json:"day"`
+	Month      int    `json:"month"`
+	Year       int    `json:"year"`
+}
+
 type Playlist struct {
 	PlaylistID         string `json:"playlist_id"`
 	ChannelID          string `json:"channel_id"`
@@ -73,6 +88,20 @@ type NewChannel struct {
 	ChannelLikedComment    string `json:"channel_liked_comment"`
 	ChannelDislikedComment string `json:"channel_disliked_comment"`
 	ChannelPremium         string `json:"channel_premium"`
+}
+
+type NewComment struct {
+	ChannelID  string `json:"channel_id"`
+	Like       int    `json:"like"`
+	Dislike    int    `json:"dislike"`
+	ReplyTo    int    `json:"reply_to"`
+	Content    string `json:"content"`
+	ReplyCount int    `json:"reply_count"`
+	VideoID    int    `json:"video_id"`
+	PostID     int    `json:"post_id"`
+	Day        int    `json:"day"`
+	Month      int    `json:"month"`
+	Year       int    `json:"year"`
 }
 
 type NewPlaylist struct {
