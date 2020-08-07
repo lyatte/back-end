@@ -489,6 +489,10 @@ func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction s
 	return video, nil
 }
 
+func (r *queryResolver) Test(ctx context.Context) (*model.Video, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
