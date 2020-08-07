@@ -19,6 +19,7 @@ type Channel struct {
 	ChannelLikedComment    string `json:"channel_liked_comment"`
 	ChannelDislikedComment string `json:"channel_disliked_comment"`
 	ChannelPremium         string `json:"channel_premium"`
+	ChannelSubscribe       string `json:"channel_subscribe"`
 }
 
 type Comment struct {
@@ -88,6 +89,7 @@ type NewChannel struct {
 	ChannelLikedComment    string `json:"channel_liked_comment"`
 	ChannelDislikedComment string `json:"channel_disliked_comment"`
 	ChannelPremium         string `json:"channel_premium"`
+	ChannelSubscribe       string `json:"channel_subscribe"`
 }
 
 type NewComment struct {

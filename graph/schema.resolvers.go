@@ -199,6 +199,47 @@ func (r *mutationResolver) DeleteChannel(ctx context.Context, channelID string) 
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddChannelSubscribe(ctx context.Context, channelID string, chSubs string) (bool, error) {
+	var channel model.Channel
+
+	var dummy model.Channel
+
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID)
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Channel not valid!")
+	}
+
+	//playlist.PlaylistVideos += videoID + ","
+
+	err1 := r.DB.Model(&dummy).Where("channel_id = ?", chSubs)
+
+	if err1 != nil {
+		log.Println(err1)
+		return false, errors.New("Channel not valid!")
+	}
+
+	channel.ChannelSubscribe += chSubs + ","
+
+	dummy.ChannelSubscribers += 1
+
+	_, updateError1 := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateError1 != nil {
+		return false, errors.New("Add subscribe failed")
+	}
+
+	_, updateError2 := r.DB.Model(&dummy).Where("channel_id = ?", chSubs).Update()
+
+	if updateError2 != nil {
+		return false, errors.New("Add subscriber failed")
+	}
+
+
+	return true, nil;
+}
+
 func (r *mutationResolver) CreatePlaylist(ctx context.Context, input *model.NewPlaylist) (*model.Playlist, error) {
 	playlist := model.Playlist{
 		ChannelID:          input.ChannelID,
@@ -397,58 +438,6 @@ func (r *queryResolver) GetVideoByCategory(ctx context.Context, videoCategory st
 	return videos, nil
 }
 
-func (r *queryResolver) GetChannel(ctx context.Context) ([]*model.Channel, error) {
-	var channels []*model.Channel
-
-	err := r.DB.Model(&channels).Order("channel_id").Select()
-
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("Query failed.")
-	}
-
-	return channels, nil
-}
-
-func (r *queryResolver) GetChannelByID(ctx context.Context, channelID string) (*model.Channel, error) {
-	var channel model.Channel
-
-	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
-
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("Query failed")
-	}
-
-	return &channel, nil
-}
-
-func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error) {
-	var playlists []*model.Playlist
-
-	err := r.DB.Model(&playlists).Where("channel_id = ?", channelID).Select()
-
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("Query failed")
-	}
-
-	return playlists, nil
-}
-
-func (r *queryResolver) GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error) {
-	var playlist model.Playlist
-
-	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Select()
-
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("Query failed")
-	}
-
-	return &playlist, nil
-}
-
 func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string) ([]*model.Comment, error) {
 	var comment []*model.Comment
 
@@ -633,7 +622,128 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 }
 
 func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Video, error) {
-	panic(fmt.Errorf("not implemented"))
+	var video []*model.Video
+
+	err := r.DB.Model(&video).Order("video_views").Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return video, nil
+}
+
+func (r *queryResolver) GetChannel(ctx context.Context) ([]*model.Channel, error) {
+	var channels []*model.Channel
+
+	err := r.DB.Model(&channels).Order("channel_id").Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed.")
+	}
+
+	return channels, nil
+}
+
+func (r *queryResolver) GetChannelByID(ctx context.Context, channelID string) (*model.Channel, error) {
+	var channel model.Channel
+
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return &channel, nil
+}
+
+func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error) {
+	var playlists []*model.Playlist
+
+	err := r.DB.Model(&playlists).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return playlists, nil
+}
+
+func (r *queryResolver) GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error) {
+	var playlist model.Playlist
+
+	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return &playlist, nil
+}
+
+func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []string, flag string) ([]*model.Video, error) {
+
+	var channel model.Channel
+
+	var final_array []*model.Video
+
+	for index, _ := range channelID {
+		err := r.DB.Model(&channel).Where("channel_id = ?", channelID[index]).Select()
+
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New("Query failed")
+		}
+
+		var video []*model.Video
+
+		err1 := r.DB.Model(&video).Where("channel_id = ?", channelID[index]).Select()
+
+		if err1 != nil {
+			log.Println(err1)
+			return nil, errors.New("Query failed")
+		}
+
+		date := time.Now()
+
+		day := date.Day()
+		month := int(date.Month())
+		year := date.Year()
+
+		if flag == "1" {
+			for index, _ := range video {
+				if video[index].Day == day && video[index].Month == month && video[index].Year == year {
+					final_array = append(final_array, video[index])
+				}
+			}
+		} else if flag == "2" {
+
+			month *= 30
+			year *= 365
+
+			for index, _ := range video {
+				if (day+month+year)-(date.Day()+int(date.Month())*30+date.Year()*365) < 8 {
+					final_array = append(final_array, video[index])
+				}
+			}
+		} else {
+			month *= 30
+			year *= 365
+
+			for index, _ := range video {
+				if (day+month+year)-(date.Day()+int(date.Month())*30+date.Year()*365) < 31 {
+					final_array = append(final_array, video[index])
+				}
+			}
+		}
+	}
+
+	return final_array, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -651,9 +761,3 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) Test(ctx context.Context) (*model.Video, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
-	panic(fmt.Errorf("not implemented"))
-}

@@ -43,6 +43,7 @@ type Channel{
   channel_liked_comment: String!
   channel_disliked_comment: String!
   channel_premium: String!
+  channel_subscribe: String!
 }
 
 type Playlist{
@@ -77,15 +78,21 @@ type Query{
   getVideo: [Video!]!
   getVideoById(video_id: Int!): Video!
   getVideoByCategory(video_category: String!): [Video!]!
-  getChannel: [Channel!]!
-  getChannelById(channel_id: String!): Channel!
-  getChannelPlaylist(channel_id: String!): [Playlist!]!
-  getPlaylistById(playlist_id: ID!): Playlist!
+
   getVideosComment(video_id: ID!): [Comment!]!
   getVideoByLocation(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
   getVideoHomePage(restriction: String!, location: String!): [Video!]!
   getVideoOrderedByViews: [Video!]!
+
+  getChannel: [Channel!]!
+  getChannelById(channel_id: String!): Channel!
+  getChannelPlaylist(channel_id: String!): [Playlist!]!
+
+  getPlaylistById(playlist_id: ID!): Playlist!
+
+  getSubscribeVideos(channel_id: [String!]!, flag: String!): [Video!]!
+
 }
 
 input newPlaylist{
@@ -138,6 +145,7 @@ input newChannel{
   channel_liked_comment: String!
   channel_disliked_comment: String!
   channel_premium: String!
+  channel_subscribe: String!
 }
 
 input newComment{
@@ -166,6 +174,7 @@ type Mutation{
   createChannel (channel_id: String!, input: newChannel): Channel!
   updateChannel (channel_id: String!, input: newChannel): Channel!
   deleteChannel (channel_id: String!): Boolean!
+  addChannelSubscribe (channel_id: String!, ch_subs: String!): Boolean!
 
   createPlaylist (input: newPlaylist): Playlist!
   updatePlaylist (playlist_id: ID!, input: newPlaylist): Playlist!
