@@ -493,7 +493,9 @@ func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction s
 			return nil, errors.New("Query failed")
 		}
 
-		video := video2
+		for index, _ := range video2 {
+			video = append(video, video2[index])
+		}
 
 		return video, nil
 	}
