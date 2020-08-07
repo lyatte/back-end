@@ -288,17 +288,17 @@ func (r *mutationResolver) AddPlaylistViews(ctx context.Context, playlistID stri
 
 func (r *mutationResolver) CreateComment(ctx context.Context, input *model.NewComment) (*model.Comment, error) {
 	comment := model.Comment{
-		ChannelID:          input.ChannelID,
-		Like: input.Like,
-		Dislike: input.Dislike,
-		ReplyTo: input.ReplyTo,
-		Content: input.Content,
+		ChannelID:  input.ChannelID,
+		Like:       input.Like,
+		Dislike:    input.Dislike,
+		ReplyTo:    input.ReplyTo,
+		Content:    input.Content,
 		ReplyCount: input.ReplyCount,
-		VideoID: input.VideoID,
-		PostID: input.PostID,
-		Day: input.Day,
-		Month: input.Month,
-		Year: input.Year,
+		VideoID:    input.VideoID,
+		PostID:     input.PostID,
+		Day:        input.Day,
+		Month:      input.Month,
+		Year:       input.Year,
 	}
 
 	_, err := r.DB.Model(&comment).Insert()
@@ -324,7 +324,7 @@ func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string
 
 	if flag == 1 {
 		comment.Like += 1
-	}else{
+	} else {
 		comment.Dislike += 1
 	}
 	_, updateError := r.DB.Model(&comment).Where("comment_id = ?", commentID).Update()
@@ -459,6 +459,32 @@ func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string) ([
 	}
 
 	return comment, nil
+}
+
+func (r *queryResolver) GetVideoByLocation(ctx context.Context, location string) ([]*model.Video, error) {
+	var video []*model.Video
+
+	err := r.DB.Model(&video).Where("video_region = ?", location).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return video, nil
+}
+
+func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction bool) ([]*model.Video, error) {
+	var video []*model.Video
+
+	err := r.DB.Model(&video).Where("video_restriction = ?", restriction).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return video, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

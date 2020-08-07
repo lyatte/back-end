@@ -82,6 +82,8 @@ type Query{
   getChannelPlaylist(channel_id: String!): [Playlist!]!
   getPlaylistById(playlist_id: ID!): Playlist!
   getVideosComment(video_id: ID!): [Comment!]!
+  getVideoByLocation(location: String!): [Video!]!
+  getVideoByRestriction(restriction: Boolean!): [Video!]!
 }
 
 input newPlaylist{
