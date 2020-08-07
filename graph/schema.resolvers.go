@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 )
 
@@ -552,21 +553,93 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 		if video_res[index].VideoRegion == location {
 			video2 = append(video2, video_res[index])
 		}
+
 	}
+
+	var temp int
+
+
+	var shuffled_vids []*model.Video
+
+	var i int
+
+	i = len(video2)-1
+
+	for {
+		if i >= 0 {
+			rand.Seed(time.Now().Unix())
+
+
+
+			//log.Println(len(video2))
+
+			if (len(video2)-1) != 0 {
+				temp = rand.Intn(len(video2) - 1)
+				shuffled_vids = append(shuffled_vids, video2[temp])
+			}else {
+				shuffled_vids = append(shuffled_vids, video2[0])
+			}
+
+
+
+			//log.Println(temp)
+			log.Println(i, len(video2), temp)
+
+			video2[temp] = video2[len(video2)-1]
+			video2[len(video2)-1] = nil
+			video2 = video2[:len(video2)-1]
+
+			i -= 1
+			continue
+		}
+		break
+	}
+
+
+	log.Println("done!")
+
+	var video3 []*model.Video
+
 
 	for index, _ := range video_res {
 		if video_res[index].VideoRegion != location {
-			video2 = append(video2, video_res[index])
+			video3 = append(video3, video_res[index])
 		}
 	}
 
-	log.Println(video2)
+	i = len(video3)-1
 
-	//for index, _ := range video {
-	//	video2 = append(video2, video[index])
-	//}
+	var temp2 []*model.Video
 
-	return video2, nil
+	for {
+		if i >= 0 {
+			rand.Seed(time.Now().Unix())
+
+
+			if (len(video3)-1) != 0 {
+				temp = rand.Intn(len(video3) - 1)
+				temp2 = append(temp2, video3[temp])
+			}else {
+				temp2 = append(temp2, video3[0])
+			}
+
+			video3[temp] = video3[len(video3)-1]
+			video3[len(video3)-1] = nil
+			video3 = video3[:len(video3)-1]
+
+			i -= 1
+			continue
+		}
+		break
+	}
+
+	shuffled_vids = append(shuffled_vids, temp2...)
+
+
+	log.Println(shuffled_vids)
+
+
+	return shuffled_vids, nil
 
 }
 
