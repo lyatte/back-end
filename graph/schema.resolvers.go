@@ -476,12 +476,26 @@ func (r *queryResolver) GetVideoByLocation(ctx context.Context, location string)
 
 func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error) {
 	var video []*model.Video
+	var video2 []*model.Video
 
 	err := r.DB.Model(&video).Where("video_restriction = ?", restriction).Select()
 
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("Query failed")
+	}
+
+	if restriction == "No"{
+		err := r.DB.Model(&video2).Where("video_restriction = ?", "Yes").Select()
+
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New("Query failed")
+		}
+
+		video := video2
+
+		return video, nil
 	}
 
 	log.Println(video, restriction)
@@ -508,9 +522,7 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) GetVideoByLocationRestriction(ctx context.Context, location string) ([]*model.Video, error) {
-	panic(fmt.Errorf("not implemented"))
-}
+
 func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
 	panic(fmt.Errorf("not implemented"))
 }
