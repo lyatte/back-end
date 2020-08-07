@@ -111,16 +111,16 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetChannel            func(childComplexity int) int
-		GetChannelByID        func(childComplexity int, channelID string) int
-		GetChannelPlaylist    func(childComplexity int, channelID string) int
-		GetPlaylistByID       func(childComplexity int, playlistID string) int
-		GetVideo              func(childComplexity int) int
-		GetVideoByCategory    func(childComplexity int, videoCategory string) int
-		GetVideoByID          func(childComplexity int, videoID int) int
-		GetVideoByLocation    func(childComplexity int, location string) int
-		GetVideoByRestriction func(childComplexity int, restriction string) int
-		GetVideosComment      func(childComplexity int, videoID string) int
+		GetChannel                    func(childComplexity int) int
+		GetChannelByID                func(childComplexity int, channelID string) int
+		GetChannelPlaylist            func(childComplexity int, channelID string) int
+		GetPlaylistByID               func(childComplexity int, playlistID string) int
+		GetVideo                      func(childComplexity int) int
+		GetVideoByCategory            func(childComplexity int, videoCategory string) int
+		GetVideoByID                  func(childComplexity int, videoID int) int
+		GetVideoByLocationRestriction func(childComplexity int, location string) int
+		GetVideoByRestriction         func(childComplexity int, restriction string) int
+		GetVideosComment              func(childComplexity int, videoID string) int
 	}
 
 	Video struct {
@@ -174,7 +174,7 @@ type QueryResolver interface {
 	GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error)
 	GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error)
 	GetVideosComment(ctx context.Context, videoID string) ([]*model.Comment, error)
-	GetVideoByLocation(ctx context.Context, location string) ([]*model.Video, error)
+	GetVideoByLocationRestriction(ctx context.Context, location string) ([]*model.Video, error)
 	GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error)
 }
 
@@ -737,17 +737,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetVideoByID(childComplexity, args["video_id"].(int)), true
 
-	case "Query.getVideoByLocation":
-		if e.complexity.Query.GetVideoByLocation == nil {
+	case "Query.getVideoByLocationRestriction":
+		if e.complexity.Query.GetVideoByLocationRestriction == nil {
 			break
 		}
 
-		args, err := ec.field_Query_getVideoByLocation_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_getVideoByLocationRestriction_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.GetVideoByLocation(childComplexity, args["location"].(string)), true
+		return e.complexity.Query.GetVideoByLocationRestriction(childComplexity, args["location"].(string)), true
 
 	case "Query.getVideoByRestriction":
 		if e.complexity.Query.GetVideoByRestriction == nil {
@@ -1054,7 +1054,7 @@ type Query{
   getChannelPlaylist(channel_id: String!): [Playlist!]!
   getPlaylistById(playlist_id: ID!): Playlist!
   getVideosComment(video_id: ID!): [Comment!]!
-  getVideoByLocation(location: String!): [Video!]!
+  getVideoByLocationRestriction(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
 }
 
@@ -1544,7 +1544,7 @@ func (ec *executionContext) field_Query_getVideoById_args(ctx context.Context, r
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_getVideoByLocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getVideoByLocationRestriction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -3925,7 +3925,7 @@ func (ec *executionContext) _Query_getVideosComment(ctx context.Context, field g
 	return ec.marshalNComment2ᚕᚖback_endᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_getVideoByLocation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_getVideoByLocationRestriction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3941,7 +3941,7 @@ func (ec *executionContext) _Query_getVideoByLocation(ctx context.Context, field
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_getVideoByLocation_args(ctx, rawArgs)
+	args, err := ec.field_Query_getVideoByLocationRestriction_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -3949,7 +3949,7 @@ func (ec *executionContext) _Query_getVideoByLocation(ctx context.Context, field
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetVideoByLocation(rctx, args["location"].(string))
+		return ec.resolvers.Query().GetVideoByLocationRestriction(rctx, args["location"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6651,7 +6651,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "getVideoByLocation":
+		case "getVideoByLocationRestriction":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -6659,7 +6659,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getVideoByLocation(ctx, field)
+				res = ec._Query_getVideoByLocationRestriction(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
