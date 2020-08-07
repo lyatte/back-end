@@ -558,29 +558,24 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 
 	var temp int
 
-
 	var shuffled_vids []*model.Video
 
 	var i int
 
-	i = len(video2)-1
+	i = len(video2) - 1
 
 	for {
 		if i >= 0 {
 			rand.Seed(time.Now().Unix())
 
-
-
 			//log.Println(len(video2))
 
-			if (len(video2)-1) != 0 {
+			if (len(video2) - 1) != 0 {
 				temp = rand.Intn(len(video2) - 1)
 				shuffled_vids = append(shuffled_vids, video2[temp])
-			}else {
+			} else {
 				shuffled_vids = append(shuffled_vids, video2[0])
 			}
-
-
 
 			//log.Println(temp)
 			log.Println(i, len(video2), temp)
@@ -595,11 +590,9 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 		break
 	}
 
-
 	log.Println("done!")
 
 	var video3 []*model.Video
-
 
 	for index, _ := range video_res {
 		if video_res[index].VideoRegion != location {
@@ -607,7 +600,7 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 		}
 	}
 
-	i = len(video3)-1
+	i = len(video3) - 1
 
 	var temp2 []*model.Video
 
@@ -615,11 +608,10 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 		if i >= 0 {
 			rand.Seed(time.Now().Unix())
 
-
-			if (len(video3)-1) != 0 {
+			if (len(video3) - 1) != 0 {
 				temp = rand.Intn(len(video3) - 1)
 				temp2 = append(temp2, video3[temp])
-			}else {
+			} else {
 				temp2 = append(temp2, video3[0])
 			}
 
@@ -635,12 +627,13 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 
 	shuffled_vids = append(shuffled_vids, temp2...)
 
-
 	log.Println(shuffled_vids)
 
-
 	return shuffled_vids, nil
+}
 
+func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Video, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.

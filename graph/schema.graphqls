@@ -85,7 +85,7 @@ type Query{
   getVideoByLocation(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
   getVideoHomePage(restriction: String!, location: String!): [Video!]!
-
+  getVideoOrderedByViews: [Video!]!
 }
 
 input newPlaylist{
