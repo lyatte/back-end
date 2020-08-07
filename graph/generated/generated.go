@@ -119,7 +119,7 @@ type ComplexityRoot struct {
 		GetVideoByCategory    func(childComplexity int, videoCategory string) int
 		GetVideoByID          func(childComplexity int, videoID int) int
 		GetVideoByLocation    func(childComplexity int, location string) int
-		GetVideoByRestriction func(childComplexity int, restriction bool) int
+		GetVideoByRestriction func(childComplexity int, restriction string) int
 		GetVideosComment      func(childComplexity int, videoID string) int
 	}
 
@@ -175,7 +175,7 @@ type QueryResolver interface {
 	GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error)
 	GetVideosComment(ctx context.Context, videoID string) ([]*model.Comment, error)
 	GetVideoByLocation(ctx context.Context, location string) ([]*model.Video, error)
-	GetVideoByRestriction(ctx context.Context, restriction bool) ([]*model.Video, error)
+	GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error)
 }
 
 type executableSchema struct {
@@ -759,7 +759,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetVideoByRestriction(childComplexity, args["restriction"].(bool)), true
+		return e.complexity.Query.GetVideoByRestriction(childComplexity, args["restriction"].(string)), true
 
 	case "Query.getVideosComment":
 		if e.complexity.Query.GetVideosComment == nil {
@@ -1055,7 +1055,7 @@ type Query{
   getPlaylistById(playlist_id: ID!): Playlist!
   getVideosComment(video_id: ID!): [Comment!]!
   getVideoByLocation(location: String!): [Video!]!
-  getVideoByRestriction(restriction: Boolean!): [Video!]!
+  getVideoByRestriction(restriction: String!): [Video!]!
 }
 
 input newPlaylist{
@@ -1561,9 +1561,9 @@ func (ec *executionContext) field_Query_getVideoByLocation_args(ctx context.Cont
 func (ec *executionContext) field_Query_getVideoByRestriction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 bool
+	var arg0 string
 	if tmp, ok := rawArgs["restriction"]; ok {
-		arg0, err = ec.unmarshalNBoolean2bool(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3990,7 +3990,7 @@ func (ec *executionContext) _Query_getVideoByRestriction(ctx context.Context, fi
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetVideoByRestriction(rctx, args["restriction"].(bool))
+		return ec.resolvers.Query().GetVideoByRestriction(rctx, args["restriction"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

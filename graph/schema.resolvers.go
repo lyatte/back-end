@@ -474,7 +474,7 @@ func (r *queryResolver) GetVideoByLocation(ctx context.Context, location string)
 	return video, nil
 }
 
-func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction bool) ([]*model.Video, error) {
+func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error) {
 	var video []*model.Video
 
 	err := r.DB.Model(&video).Where("video_restriction = ?", restriction).Select()
@@ -483,6 +483,8 @@ func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction b
 		log.Println(err)
 		return nil, errors.New("Query failed")
 	}
+
+	log.Println(video, restriction)
 
 	return video, nil
 }
