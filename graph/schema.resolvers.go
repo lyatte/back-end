@@ -465,7 +465,6 @@ func (r *queryResolver) GetVideoByLocation(ctx context.Context, location string)
 	var video []*model.Video
 	var video2 []*model.Video
 
-
 	//video, err ;= r.DB.Query("SELECT * FROM videos WHERE ")
 
 	err := r.DB.Model(&video).Where("video_region != ?", location).Select()
@@ -488,8 +487,6 @@ func (r *queryResolver) GetVideoByLocation(ctx context.Context, location string)
 		video2 = append(video2, video[index])
 	}
 
-
-
 	return video2, nil
 }
 
@@ -504,7 +501,7 @@ func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction s
 		return nil, errors.New("Query failed")
 	}
 
-	if restriction == "No"{
+	if restriction == "No" {
 		err := r.DB.Model(&video2).Where("video_restriction = ?", "Yes").Select()
 
 		if err != nil {
@@ -524,8 +521,53 @@ func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction s
 	return video, nil
 }
 
-func (r *queryResolver) Test(ctx context.Context) (*model.Video, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string, location string) ([]*model.Video, error) {
+	var video_res []*model.Video
+	var video2_res []*model.Video
+
+	err := r.DB.Model(&video_res).Where("video_restriction = ?", "No").Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	if restriction == "No" {
+		err := r.DB.Model(&video2_res).Where("video_restriction = ?", "Yes").Select()
+
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New("Query failed")
+		}
+
+		for index, _ := range video2_res {
+			video_res = append(video_res, video2_res[index])
+		}
+
+	}
+
+	var video2 []*model.Video
+
+	for index, _ := range video_res {
+		if video_res[index].VideoRegion == location {
+			video2 = append(video2, video_res[index])
+		}
+	}
+
+	for index, _ := range video_res {
+		if video_res[index].VideoRegion != location {
+			video2 = append(video2, video_res[index])
+		}
+	}
+
+	log.Println(video2)
+
+	//for index, _ := range video {
+	//	video2 = append(video2, video[index])
+	//}
+
+	return video2, nil
+
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -543,7 +585,9 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-
+func (r *queryResolver) Test(ctx context.Context) (*model.Video, error) {
+	panic(fmt.Errorf("not implemented"))
+}
 func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
 	panic(fmt.Errorf("not implemented"))
 }
