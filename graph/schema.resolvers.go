@@ -401,8 +401,8 @@ func (r *mutationResolver) UpdateCommentRc(ctx context.Context, commentID string
 
 func (r *mutationResolver) CreateMembership(ctx context.Context, input *model.NewMembership) (*model.Membership, error) {
 	membership := model.Membership{
-		MembershipID: input.MembershipID,
-		MembershipName: input.MembershipName,
+		MembershipID:    input.MembershipID,
+		MembershipName:  input.MembershipName,
 		MembershipPrice: input.MembershipPrice,
 	}
 
@@ -415,6 +415,39 @@ func (r *mutationResolver) CreateMembership(ctx context.Context, input *model.Ne
 		log.Println("Insert success!")
 		return &membership, nil
 	}
+}
+
+func (r *mutationResolver) UpdateAccountPremium(ctx context.Context, channelID string, premiumID string, day int, month int, year int) (bool, error) {
+	var channel model.Channel
+
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Channel isn't valid")
+	}
+
+	var membership model.Membership
+
+	err1 := r.DB.Model(&membership).Where("membership_id = ?", channelID).Select()
+
+	if err1 != nil {
+		log.Println(err)
+		return false, errors.New("Membership isn't valid")
+	}
+
+	channel.ChannelPremium = membership.MembershipID
+	channel.PremiumDay = day
+	channel.PremiumMonth = month
+	channel.PremiumYear = year
+
+	_, updateError := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateError != nil {
+		return false, errors.New("Premiumship failed")
+	}
+
+	return true, nil
 }
 
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {

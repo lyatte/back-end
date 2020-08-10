@@ -20,6 +20,9 @@ type Channel struct {
 	ChannelDislikedComment string `json:"channel_disliked_comment"`
 	ChannelPremium         string `json:"channel_premium"`
 	ChannelSubscribe       string `json:"channel_subscribe"`
+	PremiumDay             int    `json:"premium_day"`
+	PremiumMonth           int    `json:"premium_month"`
+	PremiumYear            int    `json:"premium_year"`
 }
 
 type Comment struct {
@@ -96,6 +99,9 @@ type NewChannel struct {
 	ChannelDislikedComment string `json:"channel_disliked_comment"`
 	ChannelPremium         string `json:"channel_premium"`
 	ChannelSubscribe       string `json:"channel_subscribe"`
+	PremiumDay             int    `json:"premium_day"`
+	PremiumMonth           int    `json:"premium_month"`
+	PremiumYear            int    `json:"premium_year"`
 }
 
 type NewComment struct {

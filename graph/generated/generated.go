@@ -61,6 +61,9 @@ type ComplexityRoot struct {
 		ChannelPremium         func(childComplexity int) int
 		ChannelSubscribe       func(childComplexity int) int
 		ChannelSubscribers     func(childComplexity int) int
+		PremiumDay             func(childComplexity int) int
+		PremiumMonth           func(childComplexity int) int
+		PremiumYear            func(childComplexity int) int
 	}
 
 	Comment struct {
@@ -85,25 +88,26 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddChannelSubscribe func(childComplexity int, channelID string, chSubs string) int
-		AddPlaylistViews    func(childComplexity int, playlistID string) int
-		AddVideoDislike     func(childComplexity int, videoID string, channelID string) int
-		AddVideoLike        func(childComplexity int, videoID string, channelID string) int
-		AddVideoToPlaylist  func(childComplexity int, playlistID string, videoID string) int
-		AddVideoViews       func(childComplexity int, videoID string) int
-		CreateChannel       func(childComplexity int, channelID string, input *model.NewChannel) int
-		CreateComment       func(childComplexity int, input *model.NewComment) int
-		CreateMembership    func(childComplexity int, input *model.NewMembership) int
-		CreatePlaylist      func(childComplexity int, input *model.NewPlaylist) int
-		CreateVideo         func(childComplexity int, input *model.NewVideo) int
-		DeleteChannel       func(childComplexity int, channelID string) int
-		DeletePlaylist      func(childComplexity int, playlistID string) int
-		DeleteVideo         func(childComplexity int, videoID string) int
-		UpdateChannel       func(childComplexity int, channelID string, input *model.NewChannel) int
-		UpdateCommentDl     func(childComplexity int, commentID string, flag int) int
-		UpdateCommentRc     func(childComplexity int, commentID string) int
-		UpdatePlaylist      func(childComplexity int, playlistID string, input *model.NewPlaylist) int
-		UpdateVideo         func(childComplexity int, videoID string, input *model.NewVideo) int
+		AddChannelSubscribe  func(childComplexity int, channelID string, chSubs string) int
+		AddPlaylistViews     func(childComplexity int, playlistID string) int
+		AddVideoDislike      func(childComplexity int, videoID string, channelID string) int
+		AddVideoLike         func(childComplexity int, videoID string, channelID string) int
+		AddVideoToPlaylist   func(childComplexity int, playlistID string, videoID string) int
+		AddVideoViews        func(childComplexity int, videoID string) int
+		CreateChannel        func(childComplexity int, channelID string, input *model.NewChannel) int
+		CreateComment        func(childComplexity int, input *model.NewComment) int
+		CreateMembership     func(childComplexity int, input *model.NewMembership) int
+		CreatePlaylist       func(childComplexity int, input *model.NewPlaylist) int
+		CreateVideo          func(childComplexity int, input *model.NewVideo) int
+		DeleteChannel        func(childComplexity int, channelID string) int
+		DeletePlaylist       func(childComplexity int, playlistID string) int
+		DeleteVideo          func(childComplexity int, videoID string) int
+		UpdateAccountPremium func(childComplexity int, channelID string, premiumID string, day int, month int, year int) int
+		UpdateChannel        func(childComplexity int, channelID string, input *model.NewChannel) int
+		UpdateCommentDl      func(childComplexity int, commentID string, flag int) int
+		UpdateCommentRc      func(childComplexity int, commentID string) int
+		UpdatePlaylist       func(childComplexity int, playlistID string, input *model.NewPlaylist) int
+		UpdateVideo          func(childComplexity int, videoID string, input *model.NewVideo) int
 	}
 
 	Playlist struct {
@@ -179,6 +183,7 @@ type MutationResolver interface {
 	UpdateCommentDl(ctx context.Context, commentID string, flag int) (bool, error)
 	UpdateCommentRc(ctx context.Context, commentID string) (bool, error)
 	CreateMembership(ctx context.Context, input *model.NewMembership) (*model.Membership, error)
+	UpdateAccountPremium(ctx context.Context, channelID string, premiumID string, day int, month int, year int) (bool, error)
 }
 type QueryResolver interface {
 	GetVideo(ctx context.Context) ([]*model.Video, error)
@@ -330,6 +335,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Channel.ChannelSubscribers(childComplexity), true
+
+	case "Channel.premium_day":
+		if e.complexity.Channel.PremiumDay == nil {
+			break
+		}
+
+		return e.complexity.Channel.PremiumDay(childComplexity), true
+
+	case "Channel.premium_month":
+		if e.complexity.Channel.PremiumMonth == nil {
+			break
+		}
+
+		return e.complexity.Channel.PremiumMonth(childComplexity), true
+
+	case "Channel.premium_year":
+		if e.complexity.Channel.PremiumYear == nil {
+			break
+		}
+
+		return e.complexity.Channel.PremiumYear(childComplexity), true
 
 	case "Comment.channel_id":
 		if e.complexity.Comment.ChannelID == nil {
@@ -603,6 +629,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteVideo(childComplexity, args["video_id"].(string)), true
+
+	case "Mutation.updateAccountPremium":
+		if e.complexity.Mutation.UpdateAccountPremium == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAccountPremium_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAccountPremium(childComplexity, args["channel_id"].(string), args["premium_id"].(string), args["day"].(int), args["month"].(int), args["year"].(int)), true
 
 	case "Mutation.updateChannel":
 		if e.complexity.Mutation.UpdateChannel == nil {
@@ -1125,6 +1163,9 @@ type Channel{
   channel_disliked_comment: String!
   channel_premium: String!
   channel_subscribe: String!
+  premium_day: Int!
+  premium_month: Int!
+  premium_year: Int!
 }
 
 type Playlist{
@@ -1235,6 +1276,9 @@ input newChannel{
   channel_disliked_comment: String!
   channel_premium: String!
   channel_subscribe: String!
+  premium_day: Int!
+  premium_month: Int!
+  premium_year: Int!
 }
 
 input newComment{
@@ -1282,6 +1326,8 @@ type Mutation{
   updateCommentRC (comment_id: ID!): Boolean!
 
   createMembership(input: newMembership): Membership!
+
+  updateAccountPremium(channel_id: String!, premium_id: String!, day: Int!, month: Int!, year: Int!): Boolean!
 
 }
 
@@ -1527,6 +1573,52 @@ func (ec *executionContext) field_Mutation_deleteVideo_args(ctx context.Context,
 		}
 	}
 	args["video_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateAccountPremium_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channel_id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["premium_id"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["premium_id"] = arg1
+	var arg2 int
+	if tmp, ok := rawArgs["day"]; ok {
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["day"] = arg2
+	var arg3 int
+	if tmp, ok := rawArgs["month"]; ok {
+		arg3, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["month"] = arg3
+	var arg4 int
+	if tmp, ok := rawArgs["year"]; ok {
+		arg4, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["year"] = arg4
 	return args, nil
 }
 
@@ -2414,6 +2506,108 @@ func (ec *executionContext) _Channel_channel_subscribe(ctx context.Context, fiel
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_premium_day(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PremiumDay, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_premium_month(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PremiumMonth, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Channel_premium_year(ctx context.Context, field graphql.CollectedField, obj *model.Channel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Channel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PremiumYear, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Comment_comment_id(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
@@ -3703,6 +3897,47 @@ func (ec *executionContext) _Mutation_createMembership(ctx context.Context, fiel
 	res := resTmp.(*model.Membership)
 	fc.Result = res
 	return ec.marshalNMembership2ᚖback_endᚋgraphᚋmodelᚐMembership(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateAccountPremium(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateAccountPremium_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateAccountPremium(rctx, args["channel_id"].(string), args["premium_id"].(string), args["day"].(int), args["month"].(int), args["year"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Playlist_playlist_id(ctx context.Context, field graphql.CollectedField, obj *model.Playlist) (ret graphql.Marshaler) {
@@ -6469,6 +6704,24 @@ func (ec *executionContext) unmarshalInputnewChannel(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "premium_day":
+			var err error
+			it.PremiumDay, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "premium_month":
+			var err error
+			it.PremiumMonth, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "premium_year":
+			var err error
+			it.PremiumYear, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -6873,6 +7126,21 @@ func (ec *executionContext) _Channel(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "premium_day":
+			out.Values[i] = ec._Channel_premium_day(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "premium_month":
+			out.Values[i] = ec._Channel_premium_month(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "premium_year":
+			out.Values[i] = ec._Channel_premium_year(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7110,6 +7378,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "createMembership":
 			out.Values[i] = ec._Mutation_createMembership(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateAccountPremium":
+			out.Values[i] = ec._Mutation_updateAccountPremium(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

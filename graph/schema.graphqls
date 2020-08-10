@@ -44,6 +44,9 @@ type Channel{
   channel_disliked_comment: String!
   channel_premium: String!
   channel_subscribe: String!
+  premium_day: Int!
+  premium_month: Int!
+  premium_year: Int!
 }
 
 type Playlist{
@@ -154,6 +157,9 @@ input newChannel{
   channel_disliked_comment: String!
   channel_premium: String!
   channel_subscribe: String!
+  premium_day: Int!
+  premium_month: Int!
+  premium_year: Int!
 }
 
 input newComment{
@@ -201,6 +207,8 @@ type Mutation{
   updateCommentRC (comment_id: ID!): Boolean!
 
   createMembership(input: newMembership): Membership!
+
+  updateAccountPremium(channel_id: String!, premium_id: String!, day: Int!, month: Int!, year: Int!): Boolean!
 
 }
 
