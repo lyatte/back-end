@@ -631,6 +631,18 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 		return nil, errors.New("Query failed")
 	}
 
+	var final_vids []*model.Video
+
+	for index, _ := range video {
+		if video[index].VideoViews > 0 {
+			final_vids = append(final_vids, video[index])
+			log.Println(video[index].VideoViews)
+		}
+
+	}
+
+	log.Println(final_vids)
+
 	return video, nil
 }
 
@@ -726,8 +738,10 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 			month *= 30
 			year *= 365
 
+
 			for index, _ := range video {
-				if (day+month+year)-(date.Day()+int(date.Month())*30+date.Year()*365) < 8 {
+				if (day+month+year)-(video[index].Day+video[index].Month*30+video[index].Year*365) < 7 {
+					log.Println((day+month+year)-(date.Day()+int(date.Month())*30+date.Year()*365))
 					final_array = append(final_array, video[index])
 				}
 			}
@@ -736,7 +750,8 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 			year *= 365
 
 			for index, _ := range video {
-				if (day+month+year)-(date.Day()+int(date.Month())*30+date.Year()*365) < 31 {
+				if (day+month+year)-(video[index].Day+video[index].Month*30+video[index].Year*365) < 30 {
+					log.Println((day+month+year)-(date.Day()+int(date.Month())*30+date.Year()*365))
 					final_array = append(final_array, video[index])
 				}
 			}
