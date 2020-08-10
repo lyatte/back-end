@@ -748,7 +748,7 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 			}
 
 			sort.Slice(final_array[:], func(i,j int) bool {
-				return final_array[i].Day + final_array[i].Month*30 + final_array[i].Year*365 < final_array[j].Day + final_array[j].Month*30 + final_array[j].Year*365
+				return final_array[i].Day + final_array[i].Month*30 + final_array[i].Year*365 > final_array[j].Day + final_array[j].Month*30 + final_array[j].Year*365
 			})
 		} else {
 			month *= 30
@@ -762,7 +762,7 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 			}
 
 			sort.Slice(final_array[:], func(i,j int) bool {
-				return final_array[i].Day + final_array[i].Month*30 + final_array[i].Year*365 < final_array[j].Day + final_array[j].Month*30 + final_array[j].Year*365
+				return final_array[i].Day + final_array[i].Month*30 + final_array[i].Year*365 > final_array[j].Day + final_array[j].Month*30 + final_array[j].Year*365
 			})
 		}
 	}
