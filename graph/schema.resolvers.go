@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sort"
 	"math/rand"
 	"time"
 )
@@ -204,16 +205,16 @@ func (r *mutationResolver) AddChannelSubscribe(ctx context.Context, channelID st
 
 	var dummy model.Channel
 
-	err := r.DB.Model(&channel).Where("channel_id = ?", channelID)
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
 
 	if err != nil {
-		log.Println(err)
-		return false, errors.New("Channel not valid!")
+		log.Println("asd", err)
+		return false, errors.New("asd Channel not valid!")
 	}
 
 	//playlist.PlaylistVideos += videoID + ","
 
-	err1 := r.DB.Model(&dummy).Where("channel_id = ?", chSubs)
+	err1 := r.DB.Model(&dummy).Where("channel_id = ?", chSubs).Select()
 
 	if err1 != nil {
 		log.Println(err1)
@@ -745,6 +746,10 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 					final_array = append(final_array, video[index])
 				}
 			}
+
+			sort.Slice(final_array[:], func(i,j int) bool {
+				return final_array[i].Day + final_array[i].Month*30 + final_array[i].Year*365 < final_array[j].Day + final_array[j].Month*30 + final_array[j].Year*365
+			})
 		} else {
 			month *= 30
 			year *= 365
@@ -755,6 +760,10 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 					final_array = append(final_array, video[index])
 				}
 			}
+
+			sort.Slice(final_array[:], func(i,j int) bool {
+				return final_array[i].Day + final_array[i].Month*30 + final_array[i].Year*365 < final_array[j].Day + final_array[j].Month*30 + final_array[j].Year*365
+			})
 		}
 	}
 
