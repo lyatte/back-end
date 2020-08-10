@@ -37,6 +37,12 @@ type Comment struct {
 	Year       int    `json:"year"`
 }
 
+type Membership struct {
+	MembershipID    string `json:"membership_id"`
+	MembershipName  string `json:"membership_name"`
+	MembershipPrice int    `json:"membership_price"`
+}
+
 type Playlist struct {
 	PlaylistID         string `json:"playlist_id"`
 	ChannelID          string `json:"channel_id"`
@@ -104,6 +110,12 @@ type NewComment struct {
 	Day        int    `json:"day"`
 	Month      int    `json:"month"`
 	Year       int    `json:"year"`
+}
+
+type NewMembership struct {
+	MembershipID    string `json:"membership_id"`
+	MembershipName  string `json:"membership_name"`
+	MembershipPrice int    `json:"membership_price"`
 }
 
 type NewPlaylist struct {

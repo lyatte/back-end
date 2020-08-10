@@ -10,8 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"sort"
 	"math/rand"
+	"sort"
 	"time"
 )
 
@@ -237,8 +237,7 @@ func (r *mutationResolver) AddChannelSubscribe(ctx context.Context, channelID st
 		return false, errors.New("Add subscriber failed")
 	}
 
-
-	return true, nil;
+	return true, nil
 }
 
 func (r *mutationResolver) CreatePlaylist(ctx context.Context, input *model.NewPlaylist) (*model.Playlist, error) {
@@ -398,6 +397,24 @@ func (r *mutationResolver) UpdateCommentRc(ctx context.Context, commentID string
 	}
 
 	return true, nil
+}
+
+func (r *mutationResolver) CreateMembership(ctx context.Context, input *model.NewMembership) (*model.Membership, error) {
+	membership := model.Membership{
+		MembershipID: input.MembershipID,
+		MembershipName: input.MembershipName,
+		MembershipPrice: input.MembershipPrice,
+	}
+
+	_, err := r.DB.Model(&membership).Insert()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Insert failed!")
+	} else {
+		log.Println("Insert success!")
+		return &membership, nil
+	}
 }
 
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
@@ -714,7 +731,6 @@ func (r *queryResolver) GetPlaylistByID(ctx context.Context, playlistID string) 
 }
 
 func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []string, flag string) ([]*model.Video, error) {
-
 	var channel model.Channel
 
 	var final_array []*model.Video
@@ -744,7 +760,7 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 
 		if flag == "1" {
 			for index, _ := range video {
-				if video[index].Day == day && video[index].Month == month && video[index].Year == year {
+				if video[index].Day == day && video[index].Month*30 == month*30 && video[index].Year*365 == year*365 {
 					final_array = append(final_array, video[index])
 				}
 			}
@@ -753,16 +769,15 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 			month *= 30
 			year *= 365
 
-
 			for index, _ := range video {
 				if (day+month+year)-(video[index].Day+video[index].Month*30+video[index].Year*365) < 7 {
-					log.Println((day+month+year)-(date.Day()+int(date.Month())*30+date.Year()*365))
+					log.Println((day + month + year) - (date.Day() + int(date.Month())*30 + date.Year()*365))
 					final_array = append(final_array, video[index])
 				}
 			}
 
-			sort.Slice(final_array[:], func(i,j int) bool {
-				return final_array[i].Day + final_array[i].Month*30 + final_array[i].Year*365 > final_array[j].Day + final_array[j].Month*30 + final_array[j].Year*365
+			sort.Slice(final_array[:], func(i, j int) bool {
+				return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
 			})
 		} else {
 			month *= 30
@@ -770,18 +785,31 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 
 			for index, _ := range video {
 				if (day+month+year)-(video[index].Day+video[index].Month*30+video[index].Year*365) < 30 {
-					log.Println((day+month+year)-(date.Day()+int(date.Month())*30+date.Year()*365))
+					log.Println((day + month + year) - (date.Day() + int(date.Month())*30 + date.Year()*365))
 					final_array = append(final_array, video[index])
 				}
 			}
 
-			sort.Slice(final_array[:], func(i,j int) bool {
-				return final_array[i].Day + final_array[i].Month*30 + final_array[i].Year*365 > final_array[j].Day + final_array[j].Month*30 + final_array[j].Year*365
+			sort.Slice(final_array[:], func(i, j int) bool {
+				return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
 			})
 		}
 	}
 
 	return final_array, nil
+}
+
+func (r *queryResolver) GetMemberships(ctx context.Context) ([]*model.Membership, error) {
+	var memberships []*model.Membership
+
+	err := r.DB.Model(&memberships).Order("membership_id").Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return memberships, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -792,10 +820,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.

@@ -74,6 +74,12 @@ type Comment{
   year: Int!
 }
 
+type Membership{
+  membership_id: String!
+  membership_name: String!
+  membership_price: Int!
+}
+
 type Query{
   getVideo: [Video!]!
   getVideoById(video_id: Int!): Video!
@@ -92,6 +98,8 @@ type Query{
   getPlaylistById(playlist_id: ID!): Playlist!
 
   getSubscribeVideos(channel_id: [String!]!, flag: String!): [Video!]!
+
+  getMemberships: [Membership!]!
 
 }
 
@@ -162,6 +170,12 @@ input newComment{
   year: Int!
 }
 
+input newMembership{
+  membership_id: String!
+  membership_name: String!
+  membership_price: Int!
+}
+
 
 type Mutation{
   createVideo (input: newVideo): Video!
@@ -185,6 +199,8 @@ type Mutation{
   createComment (input: newComment): Comment!
   updateCommentDL (comment_id: ID!, flag: Int!): Boolean!
   updateCommentRC (comment_id: ID!): Boolean!
+
+  createMembership(input: newMembership): Membership!
 
 }
 
