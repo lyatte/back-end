@@ -429,7 +429,7 @@ func (r *mutationResolver) UpdateAccountPremium(ctx context.Context, channelID s
 
 	var membership model.Membership
 
-	err1 := r.DB.Model(&membership).Where("membership_id = ?", channelID).Select()
+	err1 := r.DB.Model(&membership).Where("membership_id = ?", premiumID).Select()
 
 	if err1 != nil {
 		log.Println(err)
