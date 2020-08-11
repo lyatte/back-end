@@ -579,7 +579,9 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 		log.Println(vid[index], "Asd", len(vid))
 	}
 
+
 	if premiumID == "1" || premiumID == "2" {
+		log.Println("masuk sini")
 		err_pr2 := r.DB.Model(&vid2).Where("video_premium = ?", "true").Select()
 
 		if err_pr2 != nil {
@@ -592,21 +594,28 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 		}
 	}
 
+	log.Println("here2", len(vid))
+
 	for index, _ := range vid {
 		if vid[index].VideoRestriction == "No" {
 			video_res = append(video_res, vid[index])
 		}
 	}
 
-	if restriction == "No" {
+	log.Println("hereee", len(video_res))
 
+	if restriction == "No" {
+		log.Println("masuk sini desu")
 		for index, _ := range vid {
 			if vid[index].VideoRestriction == "Yes" {
 				video_res = append(video_res, vid[index])
 			}
 		}
 
+
 	}
+
+	log.Println("here", len(video_res))
 
 	var video2 []*model.Video
 
