@@ -13,7 +13,7 @@ type Video{
   video_dislike: Int!
   video_privacy: String!
   video_premium: Boolean!
-  video_restriction: Boolean!
+  video_restriction: String!
   video_thumbnail: String!
   video: String!
   video_views: Int!
@@ -91,7 +91,7 @@ type Query{
   getVideosComment(video_id: ID!): [Comment!]!
   getVideoByLocation(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
-  getVideoHomePage(restriction: String!, location: String!): [Video!]!
+  getVideoHomePage(restriction: String!, location: String!, premium_id: String!): [Video!]!
   getVideoOrderedByViews: [Video!]!
 
   getChannel: [Channel!]!
@@ -126,7 +126,7 @@ input newVideo{
   video_dislike: Int!
   video_privacy: String!
   video_premium: Boolean!
-  video_restriction: Boolean!
+  video_restriction: String!
   video_thumbnail: String!
   video: String!
   video_views: Int!

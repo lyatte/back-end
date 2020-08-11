@@ -135,7 +135,7 @@ type ComplexityRoot struct {
 		GetVideoByID           func(childComplexity int, videoID int) int
 		GetVideoByLocation     func(childComplexity int, location string) int
 		GetVideoByRestriction  func(childComplexity int, restriction string) int
-		GetVideoHomePage       func(childComplexity int, restriction string, location string) int
+		GetVideoHomePage       func(childComplexity int, restriction string, location string, premiumID string) int
 		GetVideoOrderedByViews func(childComplexity int) int
 		GetVideosComment       func(childComplexity int, videoID string) int
 	}
@@ -192,7 +192,7 @@ type QueryResolver interface {
 	GetVideosComment(ctx context.Context, videoID string) ([]*model.Comment, error)
 	GetVideoByLocation(ctx context.Context, location string) ([]*model.Video, error)
 	GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error)
-	GetVideoHomePage(ctx context.Context, restriction string, location string) ([]*model.Video, error)
+	GetVideoHomePage(ctx context.Context, restriction string, location string, premiumID string) ([]*model.Video, error)
 	GetVideoOrderedByViews(ctx context.Context) ([]*model.Video, error)
 	GetChannel(ctx context.Context) ([]*model.Channel, error)
 	GetChannelByID(ctx context.Context, channelID string) (*model.Channel, error)
@@ -899,7 +899,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetVideoHomePage(childComplexity, args["restriction"].(string), args["location"].(string)), true
+		return e.complexity.Query.GetVideoHomePage(childComplexity, args["restriction"].(string), args["location"].(string), args["premium_id"].(string)), true
 
 	case "Query.getVideoOrderedByViews":
 		if e.complexity.Query.GetVideoOrderedByViews == nil {
@@ -1132,7 +1132,7 @@ type Video{
   video_dislike: Int!
   video_privacy: String!
   video_premium: Boolean!
-  video_restriction: Boolean!
+  video_restriction: String!
   video_thumbnail: String!
   video: String!
   video_views: Int!
@@ -1210,7 +1210,7 @@ type Query{
   getVideosComment(video_id: ID!): [Comment!]!
   getVideoByLocation(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
-  getVideoHomePage(restriction: String!, location: String!): [Video!]!
+  getVideoHomePage(restriction: String!, location: String!, premium_id: String!): [Video!]!
   getVideoOrderedByViews: [Video!]!
 
   getChannel: [Channel!]!
@@ -1245,7 +1245,7 @@ input newVideo{
   video_dislike: Int!
   video_privacy: String!
   video_premium: Boolean!
-  video_restriction: Boolean!
+  video_restriction: String!
   video_thumbnail: String!
   video: String!
   video_views: Int!
@@ -1877,6 +1877,14 @@ func (ec *executionContext) field_Query_getVideoHomePage_args(ctx context.Contex
 		}
 	}
 	args["location"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["premium_id"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["premium_id"] = arg2
 	return args, nil
 }
 
@@ -4543,7 +4551,7 @@ func (ec *executionContext) _Query_getVideoHomePage(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetVideoHomePage(rctx, args["restriction"].(string), args["location"].(string))
+		return ec.resolvers.Query().GetVideoHomePage(rctx, args["restriction"].(string), args["location"].(string), args["premium_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5196,9 +5204,9 @@ func (ec *executionContext) _Video_video_restriction(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Video_video_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
@@ -6952,7 +6960,7 @@ func (ec *executionContext) unmarshalInputnewVideo(ctx context.Context, obj inte
 			}
 		case "video_restriction":
 			var err error
-			it.VideoRestriction, err = ec.unmarshalNBoolean2bool(ctx, v)
+			it.VideoRestriction, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

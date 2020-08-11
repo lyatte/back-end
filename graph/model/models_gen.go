@@ -68,7 +68,7 @@ type Video struct {
 	VideoDislike     int    `json:"video_dislike"`
 	VideoPrivacy     string `json:"video_privacy"`
 	VideoPremium     bool   `json:"video_premium"`
-	VideoRestriction bool   `json:"video_restriction"`
+	VideoRestriction string `json:"video_restriction"`
 	VideoThumbnail   string `json:"video_thumbnail"`
 	Video            string `json:"video"`
 	VideoViews       int    `json:"video_views"`
@@ -144,7 +144,7 @@ type NewVideo struct {
 	VideoDislike     int    `json:"video_dislike"`
 	VideoPrivacy     string `json:"video_privacy"`
 	VideoPremium     bool   `json:"video_premium"`
-	VideoRestriction bool   `json:"video_restriction"`
+	VideoRestriction string `json:"video_restriction"`
 	VideoThumbnail   string `json:"video_thumbnail"`
 	Video            string `json:"video"`
 	VideoViews       int    `json:"video_views"`

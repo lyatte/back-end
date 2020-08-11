@@ -562,36 +562,47 @@ func (r *queryResolver) GetVideoByRestriction(ctx context.Context, restriction s
 	return video, nil
 }
 
-func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string, location string) ([]*model.Video, error) {
+func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string, location string, premiumID string) ([]*model.Video, error) {
+	var vid []*model.Video
+	var vid2 []*model.Video
+
 	var video_res []*model.Video
-	var video2_res []*model.Video
 
-	err := r.DB.Model(&video_res).Where("video_restriction = ?", "No").Select()
+	err_pr := r.DB.Model(&vid).Where("channel_premium != ?", "true").Select()
 
-	log.Println(len(video_res))
-
-	if err != nil {
-		log.Println(err)
+	if err_pr != nil {
+		log.Println(err_pr)
 		return nil, errors.New("Query failed")
 	}
 
-	if restriction == "No" {
-		err := r.DB.Model(&video2_res).Where("video_restriction = ?", "Yes").Select()
+	if premiumID == "1" || premiumID == "2" {
+		err_pr2 := r.DB.Model(&vid2).Where("channel_premium = ?", "true").Select()
 
-		log.Println(len(video2_res))
-
-		if err != nil {
-			log.Println(err)
+		if err_pr2 != nil {
+			log.Println(err_pr2)
 			return nil, errors.New("Query failed")
 		}
 
-		for index, _ := range video2_res {
-			video_res = append(video_res, video2_res[index])
+		for index, _ := range vid2 {
+			vid = append(vid, vid2[index])
+		}
+	}
+
+	for index, _ := range vid {
+		if vid[index].VideoRestriction == "No" {
+			video_res = append(video_res, vid[index])
+		}
+	}
+
+	if restriction == "No" {
+
+		for index, _ := range vid {
+			if vid[index].VideoRestriction == "Yes" {
+				video_res = append(video_res, vid[index])
+			}
 		}
 
 	}
-
-	log.Println(len(video_res), "here")
 
 	var video2 []*model.Video
 
@@ -609,8 +620,6 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 	var i int
 
 	i = len(video2) - 1
-
-	log.Println("asd", i)
 
 	for {
 		if i >= 0 {
@@ -638,8 +647,6 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 		break
 	}
 
-	log.Println("done!")
-
 	var video3 []*model.Video
 
 	for index, _ := range video_res {
@@ -649,8 +656,6 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 	}
 
 	i = len(video3) - 1
-
-	log.Println("asd", i)
 
 	var temp2 []*model.Video
 
@@ -676,12 +681,6 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 	}
 
 	shuffled_vids = append(shuffled_vids, temp2...)
-
-	log.Println(shuffled_vids)
-
-	for index, _ := range shuffled_vids {
-		fmt.Print(index)
-	}
 
 	return shuffled_vids, nil
 }
