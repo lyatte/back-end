@@ -94,6 +94,8 @@ type Query{
   getVideoHomePage(restriction: String!, location: String!, premium_id: String!): [Video!]!
   getVideoOrderedByViews: [Video!]!
 
+  getRelatedVideo(location: String!, category: String!): [Video!]!
+
   getChannel: [Channel!]!
   getChannelById(channel_id: String!): Channel!
   getChannelPlaylist(channel_id: String!): [Playlist!]!

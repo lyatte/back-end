@@ -575,10 +575,9 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 		return nil, errors.New("asd Query failed")
 	}
 
-	for index, _ := range vid{
+	for index, _ := range vid {
 		log.Println(vid[index], "Asd", len(vid))
 	}
-
 
 	if premiumID == "1" || premiumID == "2" {
 		log.Println("masuk sini")
@@ -611,7 +610,6 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 				video_res = append(video_res, vid[index])
 			}
 		}
-
 
 	}
 
@@ -721,6 +719,35 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 	log.Println(final_vids)
 
 	return video, nil
+}
+
+func (r *queryResolver) GetRelatedVideo(ctx context.Context, location string, category string) ([]*model.Video, error) {
+	var video []*model.Video
+
+	err := r.DB.Model(&video).Where("video_region = ?", location).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed.")
+	}
+
+	var video2 []*model.Video
+
+	err2 := r.DB.Model(&video2).Where("video_category = ?", category).Select()
+
+	if err2 != nil {
+		log.Println(err2)
+		return nil, errors.New("Query failed.")
+	}
+
+	var final_vids []*model.Video
+
+	final_vids = append(final_vids, video...)
+
+	final_vids = append(final_vids, video2...)
+
+
+	return final_vids, nil
 }
 
 func (r *queryResolver) GetChannel(ctx context.Context) ([]*model.Channel, error) {
