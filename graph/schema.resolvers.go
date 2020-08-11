@@ -568,15 +568,15 @@ func (r *queryResolver) GetVideoHomePage(ctx context.Context, restriction string
 
 	var video_res []*model.Video
 
-	err_pr := r.DB.Model(&vid).Where("channel_premium != ?", "true").Select()
+	err_pr := r.DB.Model(&vid).Where("video_premium != ?", "true").Select()
 
 	if err_pr != nil {
 		log.Println(err_pr)
-		return nil, errors.New("Query failed")
+		return nil, errors.New("asd Query failed")
 	}
 
 	if premiumID == "1" || premiumID == "2" {
-		err_pr2 := r.DB.Model(&vid2).Where("channel_premium = ?", "true").Select()
+		err_pr2 := r.DB.Model(&vid2).Where("video_premium = ?", "true").Select()
 
 		if err_pr2 != nil {
 			log.Println(err_pr2)
