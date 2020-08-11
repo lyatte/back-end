@@ -721,23 +721,59 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 	return video, nil
 }
 
-func (r *queryResolver) GetRelatedVideo(ctx context.Context, location string, category string) ([]*model.Video, error) {
+func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string, premiumID string, location string, category string) ([]*model.Video, error) {
+	var vid []*model.Video
+	var vid2 []*model.Video
+
+	var video_res []*model.Video
+
+	err_pr := r.DB.Model(&vid).Where("video_premium = false").Select()
+
+	if err_pr != nil {
+		log.Println(err_pr)
+		return nil, errors.New("asd Query failed")
+	}
+
+	if premiumID == "1" || premiumID == "2" {
+		err_pr2 := r.DB.Model(&vid2).Where("video_premium = ?", "true").Select()
+
+		if err_pr2 != nil {
+			log.Println(err_pr2)
+			return nil, errors.New("Query failed")
+		}
+
+		for index, _ := range vid2 {
+			vid = append(vid, vid2[index])
+		}
+	}
+
+	for index, _ := range vid {
+		if vid[index].VideoRestriction == "No" {
+			video_res = append(video_res, vid[index])
+		}
+	}
+	if restriction == "No" {
+		for index, _ := range vid {
+			if vid[index].VideoRestriction == "Yes" {
+				video_res = append(video_res, vid[index])
+			}
+		}
+	}
+
 	var video []*model.Video
 
-	err := r.DB.Model(&video).Where("video_region = ?", location).Select()
-
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("Query failed.")
+	for index, _ := range video_res {
+		if video_res[index].VideoRegion == location {
+			video = append(video, video_res[index])
+		}
 	}
 
 	var video2 []*model.Video
 
-	err2 := r.DB.Model(&video2).Where("video_category = ?", category).Select()
-
-	if err2 != nil {
-		log.Println(err2)
-		return nil, errors.New("Query failed.")
+	for index, _ := range video_res {
+		if video_res[index].VideoCategory == category {
+			video2 = append(video2, video_res[index])
+		}
 	}
 
 	var final_vids []*model.Video
@@ -745,7 +781,6 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, location string, ca
 	final_vids = append(final_vids, video...)
 
 	final_vids = append(final_vids, video2...)
-
 
 	return final_vids, nil
 }

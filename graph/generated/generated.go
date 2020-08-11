@@ -129,7 +129,7 @@ type ComplexityRoot struct {
 		GetChannelPlaylist     func(childComplexity int, channelID string) int
 		GetMemberships         func(childComplexity int) int
 		GetPlaylistByID        func(childComplexity int, playlistID string) int
-		GetRelatedVideo        func(childComplexity int, location string, category string) int
+		GetRelatedVideo        func(childComplexity int, restriction string, premiumID string, location string, category string) int
 		GetSubscribeVideos     func(childComplexity int, channelID []string, flag string) int
 		GetVideo               func(childComplexity int) int
 		GetVideoByCategory     func(childComplexity int, videoCategory string) int
@@ -195,7 +195,7 @@ type QueryResolver interface {
 	GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error)
 	GetVideoHomePage(ctx context.Context, restriction string, location string, premiumID string) ([]*model.Video, error)
 	GetVideoOrderedByViews(ctx context.Context) ([]*model.Video, error)
-	GetRelatedVideo(ctx context.Context, location string, category string) ([]*model.Video, error)
+	GetRelatedVideo(ctx context.Context, restriction string, premiumID string, location string, category string) ([]*model.Video, error)
 	GetChannel(ctx context.Context) ([]*model.Channel, error)
 	GetChannelByID(ctx context.Context, channelID string) (*model.Channel, error)
 	GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error)
@@ -834,7 +834,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetRelatedVideo(childComplexity, args["location"].(string), args["category"].(string)), true
+		return e.complexity.Query.GetRelatedVideo(childComplexity, args["restriction"].(string), args["premium_id"].(string), args["location"].(string), args["category"].(string)), true
 
 	case "Query.getSubscribeVideos":
 		if e.complexity.Query.GetSubscribeVideos == nil {
@@ -1227,7 +1227,7 @@ type Query{
   getVideoHomePage(restriction: String!, location: String!, premium_id: String!): [Video!]!
   getVideoOrderedByViews: [Video!]!
 
-  getRelatedVideo(location: String!, category: String!): [Video!]!
+  getRelatedVideo(restriction: String!, premium_id: String!, location: String!, category: String!): [Video!]!
 
   getChannel: [Channel!]!
   getChannelById(channel_id: String!): Channel!
@@ -1800,21 +1800,37 @@ func (ec *executionContext) field_Query_getRelatedVideo_args(ctx context.Context
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["location"]; ok {
+	if tmp, ok := rawArgs["restriction"]; ok {
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["location"] = arg0
+	args["restriction"] = arg0
 	var arg1 string
-	if tmp, ok := rawArgs["category"]; ok {
+	if tmp, ok := rawArgs["premium_id"]; ok {
 		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["category"] = arg1
+	args["premium_id"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["location"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["location"] = arg2
+	var arg3 string
+	if tmp, ok := rawArgs["category"]; ok {
+		arg3, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["category"] = arg3
 	return args, nil
 }
 
@@ -4664,7 +4680,7 @@ func (ec *executionContext) _Query_getRelatedVideo(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetRelatedVideo(rctx, args["location"].(string), args["category"].(string))
+		return ec.resolvers.Query().GetRelatedVideo(rctx, args["restriction"].(string), args["premium_id"].(string), args["location"].(string), args["category"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
