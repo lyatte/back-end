@@ -767,9 +767,24 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 
 	}
 
-	log.Println(final_vids)
+	date := time.Now()
 
-	return final_vids, nil
+	day := date.Day()
+	month := int(date.Month())
+	year := date.Year()
+
+	month *= 30
+	year *= 365
+
+	var final_array []*model.Video
+
+	for index, _ := range final_vids {
+		if (day+month+year)-(final_vids[index].Day+final_vids[index].Month*30+final_vids[index].Year*365) < 7 {
+			final_array = append(final_array, final_vids[index])
+		}
+	}
+
+	return final_array, nil
 }
 
 func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string, premiumID string, location string, category string) ([]*model.Video, error) {
