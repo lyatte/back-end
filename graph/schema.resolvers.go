@@ -436,7 +436,7 @@ func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string
 				comment.Like -= 1
 				flags += 1
 			} else {
-				newArr += temp[index]
+				newArr += temp[index] + ","
 			}
 		}
 
@@ -460,7 +460,7 @@ func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string
 				comment.Dislike -= 1
 				flags += 1
 			} else {
-				newArr += temp[index]
+				newArr += temp[index] + ","
 			}
 		}
 
