@@ -774,6 +774,12 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 		}
 	}
 
+	sort.Slice(final_array[:], func(i, j int) bool {
+		return final_array[i].VideoViews > final_array[j].VideoViews
+	})
+
+
+
 	return final_array, nil
 }
 
