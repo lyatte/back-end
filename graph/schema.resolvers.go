@@ -787,7 +787,7 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 
 	var video_res []*model.Video
 
-	err_pr := r.DB.Model(&vid).Where("video_premium = false").Select()
+	err_pr := r.DB.Model(&vid).Where("video_premium = ?", "false").Select()
 
 	if err_pr != nil {
 		log.Println(err_pr)
