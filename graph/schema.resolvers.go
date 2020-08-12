@@ -757,16 +757,6 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 		return nil, errors.New("Query failed")
 	}
 
-	var final_vids []*model.Video
-
-	for index, _ := range video {
-		if video[index].VideoViews > 0 {
-			final_vids = append(final_vids, video[index])
-			log.Println(video[index].VideoViews)
-		}
-
-	}
-
 	date := time.Now()
 
 	day := date.Day()
@@ -778,9 +768,9 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 
 	var final_array []*model.Video
 
-	for index, _ := range final_vids {
-		if (day+month+year)-(final_vids[index].Day+final_vids[index].Month*30+final_vids[index].Year*365) < 7 {
-			final_array = append(final_array, final_vids[index])
+	for index, _ := range video {
+		if (day+month+year)-(video[index].Day+video[index].Month*30+video[index].Year*365) < 7 {
+			final_array = append(final_array, video[index])
 		}
 	}
 
