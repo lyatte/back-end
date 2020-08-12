@@ -212,7 +212,7 @@ type Mutation{
   addPlaylistViews (playlist_id: ID!): Boolean!
 
   createComment (input: newComment): Comment!
-  updateCommentDL (comment_id: ID!, flag: Int!): Boolean!
+  updateCommentDL (comment_id: ID!, channel_id: String!, flag: Int!): Boolean!
   updateCommentRC (comment_id: ID!): Boolean!
 
   createMembership(input: newMembership): Membership!

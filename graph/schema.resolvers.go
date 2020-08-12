@@ -405,7 +405,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input *model.NewCo
 	}
 }
 
-func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string, flag int) (bool, error) {
+func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string, channelID string, flag int) (bool, error) {
 	var comment model.Comment
 
 	err := r.DB.Model(&comment).Where("comment_id = ?", commentID).Select()
@@ -415,14 +415,74 @@ func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string
 		return false, errors.New("Comment isn't valid")
 	}
 
-	if flag == 1 {
-		comment.Like += 1
-	} else {
-		comment.Dislike += 1
+	var channel model.Channel
+
+	err2 := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if err2 != nil {
+		log.Println(err2)
+		return false, errors.New("Comment isn't valid")
 	}
+
+	if flag == 1 {
+		temp := strings.Split(channel.ChannelLikedComment, ",")
+
+		var newArr string
+
+		var flags int = 0
+
+		for index, _ := range temp {
+			if temp[index] == commentID {
+				comment.Like -= 1
+				flags += 1
+			}else{
+				newArr += temp[index]
+			}
+		}
+
+		if flags == 0 {
+			comment.Like += 1
+
+			channel.ChannelLikedComment += commentID + ","
+		} else{
+			channel.ChannelLikedComment = newArr
+		}
+
+	} else {
+		temp := strings.Split(channel.ChannelDislikedComment, ",")
+
+		var newArr string
+
+		var flags int = 0
+
+		for index, _ := range temp {
+			if temp[index] == commentID {
+				comment.Dislike -= 1
+				flags += 1
+			}else{
+				newArr += temp[index]
+			}
+		}
+
+		if flags == 0 {
+			comment.Dislike += 1
+
+			channel.ChannelDislikedComment += commentID + ","
+		} else{
+			channel.ChannelDislikedComment = newArr
+		}
+	}
+
+
 	_, updateError := r.DB.Model(&comment).Where("comment_id = ?", commentID).Update()
 
 	if updateError != nil {
+		return false, errors.New("Add Like/Dislike failed")
+	}
+
+	_, updateError2 := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateError2 != nil {
 		return false, errors.New("Add Like/Dislike failed")
 	}
 

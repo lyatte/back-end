@@ -105,7 +105,7 @@ type ComplexityRoot struct {
 		UnsubscribeChannel   func(childComplexity int, channelID string, chSubs string) int
 		UpdateAccountPremium func(childComplexity int, channelID string, premiumID string, day int, month int, year int) int
 		UpdateChannel        func(childComplexity int, channelID string, input *model.NewChannel) int
-		UpdateCommentDl      func(childComplexity int, commentID string, flag int) int
+		UpdateCommentDl      func(childComplexity int, commentID string, channelID string, flag int) int
 		UpdateCommentRc      func(childComplexity int, commentID string) int
 		UpdatePlaylist       func(childComplexity int, playlistID string, input *model.NewPlaylist) int
 		UpdateVideo          func(childComplexity int, videoID string, input *model.NewVideo) int
@@ -187,7 +187,7 @@ type MutationResolver interface {
 	AddVideoToPlaylist(ctx context.Context, playlistID string, videoID string) (bool, error)
 	AddPlaylistViews(ctx context.Context, playlistID string) (bool, error)
 	CreateComment(ctx context.Context, input *model.NewComment) (*model.Comment, error)
-	UpdateCommentDl(ctx context.Context, commentID string, flag int) (bool, error)
+	UpdateCommentDl(ctx context.Context, commentID string, channelID string, flag int) (bool, error)
 	UpdateCommentRc(ctx context.Context, commentID string) (bool, error)
 	CreateMembership(ctx context.Context, input *model.NewMembership) (*model.Membership, error)
 	UpdateAccountPremium(ctx context.Context, channelID string, premiumID string, day int, month int, year int) (bool, error)
@@ -688,7 +688,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateCommentDl(childComplexity, args["comment_id"].(string), args["flag"].(int)), true
+		return e.complexity.Mutation.UpdateCommentDl(childComplexity, args["comment_id"].(string), args["channel_id"].(string), args["flag"].(int)), true
 
 	case "Mutation.updateCommentRC":
 		if e.complexity.Mutation.UpdateCommentRc == nil {
@@ -1415,7 +1415,7 @@ type Mutation{
   addPlaylistViews (playlist_id: ID!): Boolean!
 
   createComment (input: newComment): Comment!
-  updateCommentDL (comment_id: ID!, flag: Int!): Boolean!
+  updateCommentDL (comment_id: ID!, channel_id: String!, flag: Int!): Boolean!
   updateCommentRC (comment_id: ID!): Boolean!
 
   createMembership(input: newMembership): Membership!
@@ -1770,14 +1770,22 @@ func (ec *executionContext) field_Mutation_updateCommentDL_args(ctx context.Cont
 		}
 	}
 	args["comment_id"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["flag"]; ok {
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+	var arg1 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["flag"] = arg1
+	args["channel_id"] = arg1
+	var arg2 int
+	if tmp, ok := rawArgs["flag"]; ok {
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["flag"] = arg2
 	return args, nil
 }
 
@@ -4122,7 +4130,7 @@ func (ec *executionContext) _Mutation_updateCommentDL(ctx context.Context, field
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateCommentDl(rctx, args["comment_id"].(string), args["flag"].(int))
+		return ec.resolvers.Mutation().UpdateCommentDl(rctx, args["comment_id"].(string), args["channel_id"].(string), args["flag"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
