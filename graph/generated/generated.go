@@ -102,6 +102,7 @@ type ComplexityRoot struct {
 		DeleteChannel        func(childComplexity int, channelID string) int
 		DeletePlaylist       func(childComplexity int, playlistID string) int
 		DeleteVideo          func(childComplexity int, videoID string) int
+		UnsubscribeChannel   func(childComplexity int, channelID string, chSubs string) int
 		UpdateAccountPremium func(childComplexity int, channelID string, premiumID string, day int, month int, year int) int
 		UpdateChannel        func(childComplexity int, channelID string, input *model.NewChannel) int
 		UpdateCommentDl      func(childComplexity int, commentID string, flag int) int
@@ -124,21 +125,25 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetChannel             func(childComplexity int) int
-		GetChannelByID         func(childComplexity int, channelID string) int
-		GetChannelPlaylist     func(childComplexity int, channelID string) int
-		GetMemberships         func(childComplexity int) int
-		GetPlaylistByID        func(childComplexity int, playlistID string) int
-		GetRelatedVideo        func(childComplexity int, restriction string, premiumID string, location string, category string) int
-		GetSubscribeVideos     func(childComplexity int, channelID []string, flag string) int
-		GetVideo               func(childComplexity int) int
-		GetVideoByCategory     func(childComplexity int, videoCategory string) int
-		GetVideoByID           func(childComplexity int, videoID int) int
-		GetVideoByLocation     func(childComplexity int, location string) int
-		GetVideoByRestriction  func(childComplexity int, restriction string) int
-		GetVideoHomePage       func(childComplexity int, restriction string, location string, premiumID string) int
-		GetVideoOrderedByViews func(childComplexity int) int
-		GetVideosComment       func(childComplexity int, videoID string) int
+		GetChannel                     func(childComplexity int) int
+		GetChannelByID                 func(childComplexity int, channelID string) int
+		GetChannelPlaylist             func(childComplexity int, channelID string) int
+		GetMemberships                 func(childComplexity int) int
+		GetPlaylistByID                func(childComplexity int, playlistID string) int
+		GetRelatedVideo                func(childComplexity int, restriction string, premiumID string, location string, category string) int
+		GetSubscribeVideos             func(childComplexity int, channelID []string, flag string) int
+		GetVideo                       func(childComplexity int) int
+		GetVideoByCategory             func(childComplexity int, videoCategory string) int
+		GetVideoByID                   func(childComplexity int, videoID int) int
+		GetVideoByLocation             func(childComplexity int, location string) int
+		GetVideoByRestriction          func(childComplexity int, restriction string) int
+		GetVideoCategoryAllTimePopular func(childComplexity int, restriction string, premium string, category string) int
+		GetVideoCategoryMonthPopular   func(childComplexity int, restriction string, premium string, category string) int
+		GetVideoCategoryRecently       func(childComplexity int, restriction string, premium string, category string) int
+		GetVideoCategoryWeekPopular    func(childComplexity int, restriction string, premium string, category string) int
+		GetVideoHomePage               func(childComplexity int, restriction string, location string, premiumID string) int
+		GetVideoOrderedByViews         func(childComplexity int) int
+		GetVideosComment               func(childComplexity int, videoID string) int
 	}
 
 	Video struct {
@@ -175,6 +180,7 @@ type MutationResolver interface {
 	UpdateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error)
 	DeleteChannel(ctx context.Context, channelID string) (bool, error)
 	AddChannelSubscribe(ctx context.Context, channelID string, chSubs string) (bool, error)
+	UnsubscribeChannel(ctx context.Context, channelID string, chSubs string) (bool, error)
 	CreatePlaylist(ctx context.Context, input *model.NewPlaylist) (*model.Playlist, error)
 	UpdatePlaylist(ctx context.Context, playlistID string, input *model.NewPlaylist) (*model.Playlist, error)
 	DeletePlaylist(ctx context.Context, playlistID string) (bool, error)
@@ -202,6 +208,10 @@ type QueryResolver interface {
 	GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error)
 	GetSubscribeVideos(ctx context.Context, channelID []string, flag string) ([]*model.Video, error)
 	GetMemberships(ctx context.Context) ([]*model.Membership, error)
+	GetVideoCategoryAllTimePopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
+	GetVideoCategoryWeekPopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
+	GetVideoCategoryMonthPopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
+	GetVideoCategoryRecently(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
 }
 
 type executableSchema struct {
@@ -632,6 +642,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteVideo(childComplexity, args["video_id"].(string)), true
 
+	case "Mutation.unsubscribeChannel":
+		if e.complexity.Mutation.UnsubscribeChannel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_unsubscribeChannel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UnsubscribeChannel(childComplexity, args["channel_id"].(string), args["ch_subs"].(string)), true
+
 	case "Mutation.updateAccountPremium":
 		if e.complexity.Mutation.UpdateAccountPremium == nil {
 			break
@@ -902,6 +924,54 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetVideoByRestriction(childComplexity, args["restriction"].(string)), true
+
+	case "Query.getVideoCategoryAllTimePopular":
+		if e.complexity.Query.GetVideoCategoryAllTimePopular == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getVideoCategoryAllTimePopular_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetVideoCategoryAllTimePopular(childComplexity, args["restriction"].(string), args["premium"].(string), args["category"].(string)), true
+
+	case "Query.getVideoCategoryMonthPopular":
+		if e.complexity.Query.GetVideoCategoryMonthPopular == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getVideoCategoryMonthPopular_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetVideoCategoryMonthPopular(childComplexity, args["restriction"].(string), args["premium"].(string), args["category"].(string)), true
+
+	case "Query.getVideoCategoryRecently":
+		if e.complexity.Query.GetVideoCategoryRecently == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getVideoCategoryRecently_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetVideoCategoryRecently(childComplexity, args["restriction"].(string), args["premium"].(string), args["category"].(string)), true
+
+	case "Query.getVideoCategoryWeekPopular":
+		if e.complexity.Query.GetVideoCategoryWeekPopular == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getVideoCategoryWeekPopular_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetVideoCategoryWeekPopular(childComplexity, args["restriction"].(string), args["premium"].(string), args["category"].(string)), true
 
 	case "Query.getVideoHomePage":
 		if e.complexity.Query.GetVideoHomePage == nil {
@@ -1239,6 +1309,11 @@ type Query{
 
   getMemberships: [Membership!]!
 
+  getVideoCategoryAllTimePopular(restriction: String!, premium: String!, category: String!): [Video!]!
+  getVideoCategoryWeekPopular(restriction: String!, premium: String!, category: String!): [Video!]!
+  getVideoCategoryMonthPopular(restriction: String!, premium: String!, category: String!): [Video!]!
+  getVideoCategoryRecently(restriction: String!, premium: String!, category: String!): [Video!]!
+
 }
 
 input newPlaylist{
@@ -1330,6 +1405,8 @@ type Mutation{
   updateChannel (channel_id: String!, input: newChannel): Channel!
   deleteChannel (channel_id: String!): Boolean!
   addChannelSubscribe (channel_id: String!, ch_subs: String!): Boolean!
+
+  unsubscribeChannel (channel_id: String!, ch_subs:String!): Boolean!
 
   createPlaylist (input: newPlaylist): Playlist!
   updatePlaylist (playlist_id: ID!, input: newPlaylist): Playlist!
@@ -1589,6 +1666,28 @@ func (ec *executionContext) field_Mutation_deleteVideo_args(ctx context.Context,
 		}
 	}
 	args["video_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_unsubscribeChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channel_id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["ch_subs"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ch_subs"] = arg1
 	return args, nil
 }
 
@@ -1909,6 +2008,126 @@ func (ec *executionContext) field_Query_getVideoByRestriction_args(ctx context.C
 		}
 	}
 	args["restriction"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getVideoCategoryAllTimePopular_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["restriction"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["restriction"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["premium"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["premium"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["category"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["category"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getVideoCategoryMonthPopular_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["restriction"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["restriction"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["premium"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["premium"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["category"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["category"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getVideoCategoryRecently_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["restriction"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["restriction"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["premium"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["premium"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["category"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["category"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getVideoCategoryWeekPopular_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["restriction"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["restriction"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["premium"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["premium"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["category"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["category"] = arg2
 	return args, nil
 }
 
@@ -3592,6 +3811,47 @@ func (ec *executionContext) _Mutation_addChannelSubscribe(ctx context.Context, f
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_unsubscribeChannel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_unsubscribeChannel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UnsubscribeChannel(rctx, args["channel_id"].(string), args["ch_subs"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_createPlaylist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4927,6 +5187,170 @@ func (ec *executionContext) _Query_getMemberships(ctx context.Context, field gra
 	res := resTmp.([]*model.Membership)
 	fc.Result = res
 	return ec.marshalNMembership2ᚕᚖback_endᚋgraphᚋmodelᚐMembershipᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getVideoCategoryAllTimePopular(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getVideoCategoryAllTimePopular_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetVideoCategoryAllTimePopular(rctx, args["restriction"].(string), args["premium"].(string), args["category"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getVideoCategoryWeekPopular(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getVideoCategoryWeekPopular_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetVideoCategoryWeekPopular(rctx, args["restriction"].(string), args["premium"].(string), args["category"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getVideoCategoryMonthPopular(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getVideoCategoryMonthPopular_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetVideoCategoryMonthPopular(rctx, args["restriction"].(string), args["premium"].(string), args["category"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getVideoCategoryRecently(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getVideoCategoryRecently_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetVideoCategoryRecently(rctx, args["restriction"].(string), args["premium"].(string), args["category"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7439,6 +7863,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "unsubscribeChannel":
+			out.Values[i] = ec._Mutation_unsubscribeChannel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createPlaylist":
 			out.Values[i] = ec._Mutation_createPlaylist(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -7792,6 +8221,62 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getMemberships(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getVideoCategoryAllTimePopular":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getVideoCategoryAllTimePopular(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getVideoCategoryWeekPopular":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getVideoCategoryWeekPopular(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getVideoCategoryMonthPopular":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getVideoCategoryMonthPopular(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getVideoCategoryRecently":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getVideoCategoryRecently(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

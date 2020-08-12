@@ -12,6 +12,7 @@ import (
 	"log"
 	"math/rand"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -235,6 +236,56 @@ func (r *mutationResolver) AddChannelSubscribe(ctx context.Context, channelID st
 
 	if updateError2 != nil {
 		return false, errors.New("Add subscriber failed")
+	}
+
+	return true, nil
+}
+
+func (r *mutationResolver) UnsubscribeChannel(ctx context.Context, channelID string, chSubs string) (bool, error) {
+	var channel model.Channel
+
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("No CHannel!")
+	}
+
+	var ch model.Channel
+
+	err1 := r.DB.Model(&ch).Where("channel_id = ?", chSubs).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return false, errors.New("No Channel!")
+	}
+
+	temp := strings.Split(channel.ChannelSubscribe, ",")
+
+	var temp2 string
+
+	for index, _ := range temp {
+		if temp[index] != chSubs {
+			temp2 += temp[index] + ","
+		}
+		log.Println(temp[index])
+	}
+
+	log.Println(temp2)
+
+	channel.ChannelSubscribe = temp2
+	ch.ChannelSubscribers -= 1
+
+	_, updateError1 := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateError1 != nil {
+		return false, errors.New("Change subscribe failed")
+	}
+
+	_, updateError2 := r.DB.Model(&ch).Where("channel_id = ?", chSubs).Update()
+
+	if updateError2 != nil {
+		return false, errors.New("Change subscriber failed")
 	}
 
 	return true, nil
@@ -718,7 +769,7 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 
 	log.Println(final_vids)
 
-	return video, nil
+	return final_vids, nil
 }
 
 func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string, premiumID string, location string, category string) ([]*model.Video, error) {
@@ -917,6 +968,246 @@ func (r *queryResolver) GetMemberships(ctx context.Context) ([]*model.Membership
 	}
 
 	return memberships, nil
+}
+
+func (r *queryResolver) GetVideoCategoryAllTimePopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error) {
+
+	var video []*model.Video
+
+	err1 := r.DB.Model(&video).Where("video_category = ?", category).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return nil, errors.New("Query failed")
+	}
+
+	var video_res []*model.Video
+
+	for index, _ := range video {
+		if video[index].VideoRestriction == "No" {
+			video_res = append(video_res, video[index])
+		}
+	}
+
+	if restriction == "No" {
+		for index, _ := range video {
+			if video[index].VideoRestriction == "Yes" {
+				video_res = append(video_res, video[index])
+			}
+		}
+	}
+
+	var video_prem []*model.Video
+
+	for index, _ := range video_res {
+		if video_res[index].VideoPremium == false {
+			video_prem = append(video_prem, video_res[index])
+		}
+	}
+
+	if premium == "1" || premium == "2" {
+		for index, _ := range video_res {
+			if video_res[index].VideoPremium == true {
+				video_prem = append(video_prem, video_res[index])
+			}
+		}
+	}
+
+
+	sort.Slice(video_prem[:], func(i, j int) bool {
+		return video_prem[i].VideoViews > video_prem[j].VideoViews
+	})
+
+	return video_prem, nil
+}
+
+func (r *queryResolver) GetVideoCategoryWeekPopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error) {
+	var final_array []*model.Video
+
+	var video []*model.Video
+
+	err1 := r.DB.Model(&video).Where("video_category = ?", category).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return nil, errors.New("Query failed")
+	}
+
+	var video_res []*model.Video
+
+	for index, _ := range video {
+		if video[index].VideoRestriction == "No" {
+			video_res = append(video_res, video[index])
+		}
+	}
+
+	if restriction == "No" {
+		for index, _ := range video {
+			if video[index].VideoRestriction == "Yes" {
+				video_res = append(video_res, video[index])
+			}
+		}
+	}
+
+	var video_prem []*model.Video
+
+	for index, _ := range video_res {
+		if video_res[index].VideoPremium == false {
+			video_prem = append(video_prem, video_res[index])
+		}
+	}
+
+	if premium == "1" || premium == "2" {
+		for index, _ := range video_res {
+			if video_res[index].VideoPremium == true {
+				video_prem = append(video_prem, video_res[index])
+			}
+		}
+	}
+
+	date := time.Now()
+
+	day := date.Day()
+	month := int(date.Month())
+	year := date.Year()
+
+	month *= 30
+	year *= 365
+
+	for index, _ := range video_prem {
+		if (day+month+year)-(video_prem[index].Day+video_prem[index].Month*30+video_prem[index].Year*365) < 7 {
+			log.Println((day + month + year) - (date.Day() + int(date.Month())*30 + date.Year()*365))
+			final_array = append(final_array, video_prem[index])
+		}
+	}
+
+	sort.Slice(final_array[:], func(i, j int) bool {
+		return final_array[i].VideoViews > final_array[j].VideoViews
+	})
+
+	return final_array, nil
+}
+
+func (r *queryResolver) GetVideoCategoryMonthPopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error) {
+	var final_array []*model.Video
+
+	var video []*model.Video
+
+	err1 := r.DB.Model(&video).Where("video_category = ?", category).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return nil, errors.New("Query failed")
+	}
+
+	var video_res []*model.Video
+
+	for index, _ := range video {
+		if video[index].VideoRestriction == "No" {
+			video_res = append(video_res, video[index])
+		}
+	}
+
+	if restriction == "No" {
+		for index, _ := range video {
+			if video[index].VideoRestriction == "Yes" {
+				video_res = append(video_res, video[index])
+			}
+		}
+	}
+
+	var video_prem []*model.Video
+
+	for index, _ := range video_res {
+		if video_res[index].VideoPremium == false {
+			video_prem = append(video_prem, video_res[index])
+		}
+	}
+
+	if premium == "1" || premium == "2" {
+		for index, _ := range video_res {
+			if video_res[index].VideoPremium == true {
+				video_prem = append(video_prem, video_res[index])
+			}
+		}
+	}
+
+	date := time.Now()
+
+	day := date.Day()
+	month := int(date.Month())
+	year := date.Year()
+
+	month *= 30
+	year *= 365
+
+	for index, _ := range video_prem {
+		if (day+month+year)-(video_prem[index].Day+video_prem[index].Month*30+video_prem[index].Year*365) < 30 {
+			log.Println((day + month + year) - (date.Day() + int(date.Month())*30 + date.Year()*365))
+			final_array = append(final_array, video_prem[index])
+		}
+	}
+
+	sort.Slice(final_array[:], func(i, j int) bool {
+		return final_array[i].VideoViews > final_array[j].VideoViews
+	})
+
+	return final_array, nil
+
+
+
+}
+
+func (r *queryResolver) GetVideoCategoryRecently(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error) {
+
+	var video []*model.Video
+
+	err1 := r.DB.Model(&video).Where("video_category = ?", category).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return nil, errors.New("Query failed")
+	}
+
+	var video_res []*model.Video
+
+	for index, _ := range video {
+		if video[index].VideoRestriction == "No" {
+			video_res = append(video_res, video[index])
+		}
+	}
+
+	if restriction == "No" {
+		for index, _ := range video {
+			if video[index].VideoRestriction == "Yes" {
+				video_res = append(video_res, video[index])
+			}
+		}
+	}
+
+	var video_prem []*model.Video
+
+	for index, _ := range video_res {
+		if video_res[index].VideoPremium == false {
+			video_prem = append(video_prem, video_res[index])
+		}
+	}
+
+	if premium == "1" || premium == "2" {
+		for index, _ := range video_res {
+			if video_res[index].VideoPremium == true {
+				video_prem = append(video_prem, video_res[index])
+			}
+		}
+	}
+
+
+	sort.Slice(video_prem[:], func(i, j int) bool {
+		return video_prem[i].Day+video_prem[i].Month*30+video_prem[i].Year*365 > video_prem[j].Day+video_prem[j].Month*30+video_prem[j].Year*365
+	})
+
+
+	return video_prem, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
