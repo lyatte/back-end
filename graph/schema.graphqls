@@ -12,7 +12,7 @@ type Video{
   video_like: Int!
   video_dislike: Int!
   video_privacy: String!
-  video_premium: Boolean!
+  video_premium: String!
   video_restriction: String!
   video_thumbnail: String!
   video: String!
@@ -132,7 +132,7 @@ input newVideo{
   video_like: Int!
   video_dislike: Int!
   video_privacy: String!
-  video_premium: Boolean!
+  video_premium: String!
   video_restriction: String!
   video_thumbnail: String!
   video: String!

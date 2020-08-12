@@ -1215,7 +1215,7 @@ type Video{
   video_like: Int!
   video_dislike: Int!
   video_privacy: String!
-  video_premium: Boolean!
+  video_premium: String!
   video_restriction: String!
   video_thumbnail: String!
   video: String!
@@ -1335,7 +1335,7 @@ input newVideo{
   video_like: Int!
   video_dislike: Int!
   video_privacy: String!
-  video_premium: Boolean!
+  video_premium: String!
   video_restriction: String!
   video_thumbnail: String!
   video: String!
@@ -5689,9 +5689,9 @@ func (ec *executionContext) _Video_video_premium(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Video_video_restriction(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
@@ -7473,7 +7473,7 @@ func (ec *executionContext) unmarshalInputnewVideo(ctx context.Context, obj inte
 			}
 		case "video_premium":
 			var err error
-			it.VideoPremium, err = ec.unmarshalNBoolean2bool(ctx, v)
+			it.VideoPremium, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

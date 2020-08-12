@@ -778,8 +778,6 @@ func (r *queryResolver) GetVideoOrderedByViews(ctx context.Context) ([]*model.Vi
 		return final_array[i].VideoViews > final_array[j].VideoViews
 	})
 
-
-
 	return final_array, nil
 }
 
@@ -982,7 +980,6 @@ func (r *queryResolver) GetMemberships(ctx context.Context) ([]*model.Membership
 }
 
 func (r *queryResolver) GetVideoCategoryAllTimePopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error) {
-
 	var video []*model.Video
 
 	err1 := r.DB.Model(&video).Where("video_category = ?", category).Select()
@@ -1011,19 +1008,18 @@ func (r *queryResolver) GetVideoCategoryAllTimePopular(ctx context.Context, rest
 	var video_prem []*model.Video
 
 	for index, _ := range video_res {
-		if video_res[index].VideoPremium == false {
+		if video_res[index].VideoPremium == "false" {
 			video_prem = append(video_prem, video_res[index])
 		}
 	}
 
 	if premium == "1" || premium == "2" {
 		for index, _ := range video_res {
-			if video_res[index].VideoPremium == true {
+			if video_res[index].VideoPremium == "true" {
 				video_prem = append(video_prem, video_res[index])
 			}
 		}
 	}
-
 
 	sort.Slice(video_prem[:], func(i, j int) bool {
 		return video_prem[i].VideoViews > video_prem[j].VideoViews
@@ -1063,14 +1059,14 @@ func (r *queryResolver) GetVideoCategoryWeekPopular(ctx context.Context, restric
 	var video_prem []*model.Video
 
 	for index, _ := range video_res {
-		if video_res[index].VideoPremium == false {
+		if video_res[index].VideoPremium == "false" {
 			video_prem = append(video_prem, video_res[index])
 		}
 	}
 
 	if premium == "1" || premium == "2" {
 		for index, _ := range video_res {
-			if video_res[index].VideoPremium == true {
+			if video_res[index].VideoPremium == "true" {
 				video_prem = append(video_prem, video_res[index])
 			}
 		}
@@ -1130,14 +1126,14 @@ func (r *queryResolver) GetVideoCategoryMonthPopular(ctx context.Context, restri
 	var video_prem []*model.Video
 
 	for index, _ := range video_res {
-		if video_res[index].VideoPremium == false {
+		if video_res[index].VideoPremium == "false" {
 			video_prem = append(video_prem, video_res[index])
 		}
 	}
 
 	if premium == "1" || premium == "2" {
 		for index, _ := range video_res {
-			if video_res[index].VideoPremium == true {
+			if video_res[index].VideoPremium == "true" {
 				video_prem = append(video_prem, video_res[index])
 			}
 		}
@@ -1164,13 +1160,9 @@ func (r *queryResolver) GetVideoCategoryMonthPopular(ctx context.Context, restri
 	})
 
 	return final_array, nil
-
-
-
 }
 
 func (r *queryResolver) GetVideoCategoryRecently(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error) {
-
 	var video []*model.Video
 
 	err1 := r.DB.Model(&video).Where("video_category = ?", category).Select()
@@ -1199,24 +1191,22 @@ func (r *queryResolver) GetVideoCategoryRecently(ctx context.Context, restrictio
 	var video_prem []*model.Video
 
 	for index, _ := range video_res {
-		if video_res[index].VideoPremium == false {
+		if video_res[index].VideoPremium == "false" {
 			video_prem = append(video_prem, video_res[index])
 		}
 	}
 
 	if premium == "1" || premium == "2" {
 		for index, _ := range video_res {
-			if video_res[index].VideoPremium == true {
+			if video_res[index].VideoPremium == "true" {
 				video_prem = append(video_prem, video_res[index])
 			}
 		}
 	}
 
-
 	sort.Slice(video_prem[:], func(i, j int) bool {
 		return video_prem[i].Day+video_prem[i].Month*30+video_prem[i].Year*365 > video_prem[j].Day+video_prem[j].Month*30+video_prem[j].Year*365
 	})
-
 
 	return video_prem, nil
 }
