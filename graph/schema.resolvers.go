@@ -993,6 +993,9 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 	var final_array []*model.Video
 
 	for index, _ := range channelID {
+		if channelID[index] == "" {
+			continue
+		}
 		err := r.DB.Model(&channel).Where("channel_id = ?", channelID[index]).Select()
 
 		if err != nil {
