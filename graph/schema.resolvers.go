@@ -435,7 +435,7 @@ func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string
 			if temp[index] == commentID {
 				comment.Like -= 1
 				flags += 1
-			}else{
+			} else {
 				newArr += temp[index]
 			}
 		}
@@ -444,7 +444,7 @@ func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string
 			comment.Like += 1
 
 			channel.ChannelLikedComment += commentID + ","
-		} else{
+		} else {
 			channel.ChannelLikedComment = newArr
 		}
 
@@ -459,7 +459,7 @@ func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string
 			if temp[index] == commentID {
 				comment.Dislike -= 1
 				flags += 1
-			}else{
+			} else {
 				newArr += temp[index]
 			}
 		}
@@ -468,11 +468,10 @@ func (r *mutationResolver) UpdateCommentDl(ctx context.Context, commentID string
 			comment.Dislike += 1
 
 			channel.ChannelDislikedComment += commentID + ","
-		} else{
+		} else {
 			channel.ChannelDislikedComment = newArr
 		}
 	}
-
 
 	_, updateError := r.DB.Model(&comment).Where("comment_id = ?", commentID).Update()
 
