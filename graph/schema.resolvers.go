@@ -408,7 +408,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input *model.NewCo
 		_, updateErr := r.DB.Model(&comment).Where("comment_id = ?", input.ReplyTo).Update()
 
 		if updateErr != nil {
-			return false, errors.New("Add reply count failed")
+			return nil, errors.New("Add reply count failed")
 		}
 	}
 
@@ -621,6 +621,19 @@ func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string) ([
 	var comment []*model.Comment
 
 	err := r.DB.Model(&comment).Where("video_id = ?", videoID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	return comment, nil
+}
+
+func (r *queryResolver) GetCommentReply(ctx context.Context, commentID string) ([]*model.Comment, error) {
+	var comment []*model.Comment
+
+	err := r.DB.Model(&comment).Where("reply_to = ?", commentID).Select()
 
 	if err != nil {
 		log.Println(err)

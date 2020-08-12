@@ -89,6 +89,7 @@ type Query{
   getVideoByCategory(video_category: String!): [Video!]!
 
   getVideosComment(video_id: ID!): [Comment!]!
+  getCommentReply(comment_id: ID!): [Comment!]!
   getVideoByLocation(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
   getVideoHomePage(restriction: String!, location: String!, premium_id: String!): [Video!]!

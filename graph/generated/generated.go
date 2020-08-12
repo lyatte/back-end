@@ -128,6 +128,7 @@ type ComplexityRoot struct {
 		GetChannel                     func(childComplexity int) int
 		GetChannelByID                 func(childComplexity int, channelID string) int
 		GetChannelPlaylist             func(childComplexity int, channelID string) int
+		GetCommentReply                func(childComplexity int, commentID string) int
 		GetMemberships                 func(childComplexity int) int
 		GetPlaylistByID                func(childComplexity int, playlistID string) int
 		GetRelatedVideo                func(childComplexity int, restriction string, premiumID string, location string, category string) int
@@ -197,6 +198,7 @@ type QueryResolver interface {
 	GetVideoByID(ctx context.Context, videoID int) (*model.Video, error)
 	GetVideoByCategory(ctx context.Context, videoCategory string) ([]*model.Video, error)
 	GetVideosComment(ctx context.Context, videoID string) ([]*model.Comment, error)
+	GetCommentReply(ctx context.Context, commentID string) ([]*model.Comment, error)
 	GetVideoByLocation(ctx context.Context, location string) ([]*model.Video, error)
 	GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error)
 	GetVideoHomePage(ctx context.Context, restriction string, location string, premiumID string) ([]*model.Video, error)
@@ -827,6 +829,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetChannelPlaylist(childComplexity, args["channel_id"].(string)), true
 
+	case "Query.getCommentReply":
+		if e.complexity.Query.GetCommentReply == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getCommentReply_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetCommentReply(childComplexity, args["comment_id"].(string)), true
+
 	case "Query.getMemberships":
 		if e.complexity.Query.GetMemberships == nil {
 			break
@@ -1292,6 +1306,7 @@ type Query{
   getVideoByCategory(video_category: String!): [Video!]!
 
   getVideosComment(video_id: ID!): [Comment!]!
+  getCommentReply(comment_id: ID!): [Comment!]!
   getVideoByLocation(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
   getVideoHomePage(restriction: String!, location: String!, premium_id: String!): [Video!]!
@@ -1886,6 +1901,20 @@ func (ec *executionContext) field_Query_getChannelPlaylist_args(ctx context.Cont
 		}
 	}
 	args["channel_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getCommentReply_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["comment_id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["comment_id"] = arg0
 	return args, nil
 }
 
@@ -4751,6 +4780,47 @@ func (ec *executionContext) _Query_getVideosComment(ctx context.Context, field g
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().GetVideosComment(rctx, args["video_id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalNComment2ᚕᚖback_endᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getCommentReply(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getCommentReply_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetCommentReply(rctx, args["comment_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8075,6 +8145,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getVideosComment(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getCommentReply":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getCommentReply(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
