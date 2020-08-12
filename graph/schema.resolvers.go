@@ -394,6 +394,24 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input *model.NewCo
 		Year:       input.Year,
 	}
 
+	if input.ReplyTo != 0 {
+		var comment model.Comment
+		err2 := r.DB.Model(&comment).Where("comment_id = ?", input.ReplyTo).Select()
+
+		if err2 != nil {
+			log.Println(err2)
+			return nil, errors.New("Comment id not found")
+		}
+
+		comment.ReplyCount += 1
+
+		_, updateErr := r.DB.Model(&comment).Where("comment_id = ?", input.ReplyTo).Update()
+
+		if updateErr != nil {
+			return false, errors.New("Add reply count failed")
+		}
+	}
+
 	_, err := r.DB.Model(&comment).Insert()
 
 	if err != nil {
