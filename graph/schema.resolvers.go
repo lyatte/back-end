@@ -1464,57 +1464,7 @@ func (r *queryResolver) GetSearchChannel(ctx context.Context, keyword string, up
 		return nil, errors.New("Query failed")
 	}
 
-	date := time.Now()
-
-	day := date.Day()
-	month := int(date.Month())
-	year := date.Year()
-
-	var final_array []*model.Channel
-
-	if uploadDate == "1" {
-		month *= 30
-		year *= 365
-
-		for index, _ := range channel {
-			if (day+month+year)-(channel[index].ChannelJoinDateDay+channel[index].ChannelJoinDateMonth*30+channel[index].ChannelJoinDateYear*365) < 7 {
-				final_array = append(final_array, channel[index])
-			}
-		}
-
-		sort.Slice(final_array[:], func(i, j int) bool {
-			return final_array[i].ChannelJoinDateDay+final_array[i].ChannelJoinDateMonth*30+final_array[i].ChannelJoinDateYear*365 > final_array[j].ChannelJoinDateDay+final_array[j].ChannelJoinDateMonth*30+final_array[j].ChannelJoinDateYear*365
-		})
-	} else if uploadDate == "2" {
-		month *= 30
-		year *= 365
-
-		for index, _ := range channel {
-			if (day+month+year)-(channel[index].ChannelJoinDateDay+channel[index].ChannelJoinDateMonth*30+channel[index].ChannelJoinDateYear*365) < 30 {
-				final_array = append(final_array, channel[index])
-			}
-		}
-
-		sort.Slice(final_array[:], func(i, j int) bool {
-			return final_array[i].ChannelJoinDateDay+final_array[i].ChannelJoinDateMonth*30+final_array[i].ChannelJoinDateYear*365 > final_array[j].ChannelJoinDateDay+final_array[j].ChannelJoinDateMonth*30+final_array[j].ChannelJoinDateYear*365
-		})
-
-	} else {
-		month *= 30
-		year *= 365
-
-		for index, _ := range channel {
-			if (day+month+year)-(channel[index].ChannelJoinDateDay+channel[index].ChannelJoinDateMonth*30+channel[index].ChannelJoinDateYear*365) < 365 {
-				final_array = append(final_array, channel[index])
-			}
-		}
-
-		sort.Slice(final_array[:], func(i, j int) bool {
-			return final_array[i].ChannelJoinDateDay+final_array[i].ChannelJoinDateMonth*30+final_array[i].ChannelJoinDateYear*365 > final_array[j].ChannelJoinDateDay+final_array[j].ChannelJoinDateMonth*30+final_array[j].ChannelJoinDateYear*365
-		})
-	}
-
-	return final_array, nil
+	return channel, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
