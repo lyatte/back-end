@@ -393,6 +393,43 @@ func (r *mutationResolver) AddPlaylistViews(ctx context.Context, playlistID stri
 	return true, nil
 }
 
+func (r *mutationResolver) DeleteVideoPlaylist(ctx context.Context, playlistID string, videoID string) (bool, error) {
+	var playlist model.Playlist
+
+	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("Playlist isn't valid")
+	}
+
+	temp := strings.Split(playlist.PlaylistVideos, ",")
+
+	var newVid string;
+
+	for index, _ := range temp {
+		if temp[index] == "" {
+			continue
+		}else if temp[index] == videoID {
+			continue
+		}else {
+			newVid += temp[index] + ","
+		}
+	}
+
+	log.Println(newVid)
+
+	playlist.PlaylistVideos = newVid
+
+	_, updateError := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Update()
+
+	if updateError != nil {
+		return false, errors.New("Change failed")
+	}
+
+	return true, nil
+}
+
 func (r *mutationResolver) CreateComment(ctx context.Context, input *model.NewComment) (*model.Comment, error) {
 	comment := model.Comment{
 		ChannelID:  input.ChannelID,
@@ -1746,7 +1783,7 @@ func (r *queryResolver) GetPlaylistVideo(ctx context.Context, videos string, fla
 
 	var fin_vids []*model.Video
 
-	for index,_ := range temp {
+	for index, _ := range temp {
 		for i, _ := range vid {
 			if temp[index] == "" {
 				continue
@@ -1764,16 +1801,14 @@ func (r *queryResolver) GetPlaylistVideo(ctx context.Context, videos string, fla
 	if flag == "1" { //newest
 		return fin_vids, nil
 	} else { //oldest
-		var temp = len(fin_vids)-1
+		var temp = len(fin_vids) - 1
 
-		for i:= temp; i>=0; i-- {
+		for i := temp; i >= 0; i-- {
 			t = append(t, fin_vids[i])
 		}
 
 		return t, nil
 	}
-
-
 }
 
 func (r *queryResolver) GetPlaylistVideoDp(ctx context.Context, videos string, flag string) ([]*model.Video, error) {
@@ -1789,7 +1824,7 @@ func (r *queryResolver) GetPlaylistVideoDp(ctx context.Context, videos string, f
 
 	var fin_vids []*model.Video
 
-	for index,_ := range temp {
+	for index, _ := range temp {
 		for i, _ := range vid {
 			if temp[index] == "" {
 				continue
@@ -1812,8 +1847,6 @@ func (r *queryResolver) GetPlaylistVideoDp(ctx context.Context, videos string, f
 		})
 	}
 
-
-
 	return fin_vids, nil
 }
 
@@ -1830,7 +1863,7 @@ func (r *queryResolver) GetPlaylistVideoPopularity(ctx context.Context, videos s
 
 	var fin_vids []*model.Video
 
-	for index,_ := range temp {
+	for index, _ := range temp {
 		for i, _ := range vid {
 			if temp[index] == "" {
 				continue

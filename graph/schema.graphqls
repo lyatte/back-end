@@ -227,6 +227,7 @@ type Mutation{
   deletePlaylist (playlist_id: ID!): Boolean!
   addVideoToPlaylist (playlist_id: ID!, video_id: ID!): Boolean!
   addPlaylistViews (playlist_id: ID!): Boolean!
+  deleteVideoPlaylist(playlist_id: ID!, video_id: String!): Boolean!
 
   createComment (input: newComment): Comment!
   updateCommentDL (comment_id: ID!, channel_id: String!, flag: Int!): Boolean!
