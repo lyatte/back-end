@@ -971,7 +971,15 @@ func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string
 		return nil, errors.New("Query failed")
 	}
 
-	return playlists, nil
+	var p_vis []*model.Playlist
+
+	for index,_ := range playlists {
+		if playlists[index].PlaylistVisibility == "Public"{
+			p_vis = append(p_vis, playlists[index])
+		}
+	}
+
+	return p_vis, nil
 }
 
 func (r *queryResolver) GetChannelVideo(ctx context.Context, channelID string, flag string) ([]*model.Video, error) {
