@@ -671,21 +671,26 @@ func (r *queryResolver) GetVideoByCategory(ctx context.Context, videoCategory st
 func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string, flag string) ([]*model.Comment, error) {
 	var comment []*model.Comment
 
-	err := r.DB.Model(&comment).Where("video_id = ?", videoID).Select()
+	err := r.DB.Model(&comment).Where("video_id = ?", videoID).Order("comment_id").Select()
 
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("Query failed")
 	}
 
+
 	if flag == "1"{
 		sort.Slice(comment[:], func(i, j int) bool {
 			return comment[i].Like > comment[j].Like
 		})
 	}else{
-		sort.Slice(comment[:], func(i, j int) bool {
-			return comment[i].CommentID < comment[i].CommentID
-		})
+		var temp []*model.Comment
+
+		for i:= len(comment)-1; i>=0; i--{
+			temp = append(temp, comment[i])
+		}
+
+		return temp, nil
 	}
 
 	return comment, nil
