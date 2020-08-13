@@ -974,6 +974,35 @@ func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string
 	return playlists, nil
 }
 
+func (r *queryResolver) GetChannelVideo(ctx context.Context, channelID string, flag string) ([]*model.Video, error) {
+	var video []*model.Video
+
+	err := r.DB.Model(&video).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	var vid_prem []*model.Video
+
+	for index, _ := range video{
+		if video[index].VideoPremium == "false"{
+			vid_prem = append(vid_prem, video[index])
+		}
+	}
+
+	if flag == "1" || flag == "2" {
+		for index, _ := range video{
+			if video[index].VideoPremium == "true"{
+				vid_prem = append(vid_prem, video[index])
+			}
+		}
+	}
+
+	return vid_prem, nil
+}
+
 func (r *queryResolver) GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error) {
 	var playlist model.Playlist
 
@@ -1319,16 +1348,14 @@ func (r *queryResolver) GetSearchVideo(ctx context.Context, keyword string, uplo
 	var video_res []*model.Video
 
 	for index, _ := range video {
-		if video[index].VideoPremium == "false"{
+		if video[index].VideoPremium == "false" {
 			video_res = append(video_res, video[index])
 		}
 	}
 
-
-
 	if premium == "1" || premium == "2" {
 		for index, _ := range video {
-			if video[index].VideoPremium == "true"{
+			if video[index].VideoPremium == "true" {
 				video_res = append(video_res, video[index])
 			}
 		}
