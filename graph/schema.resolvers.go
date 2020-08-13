@@ -1514,6 +1514,11 @@ func (r *queryResolver) GetChannelVideoRecent(ctx context.Context, channelID str
 
 	var video_prem []*model.Video
 
+	for index, _ := range video {
+		if video[index].VideoPremium == "false" {
+			video_prem = append(video_prem, video[index])
+		}
+	}
 
 	if flag == "1" || flag == "2" {
 		for index, _ := range video {
