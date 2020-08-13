@@ -322,7 +322,7 @@ func (r *mutationResolver) UpdatePlaylist(ctx context.Context, playlistID string
 func (r *mutationResolver) DeletePlaylist(ctx context.Context, playlistID string) (bool, error) {
 	var playlist model.Playlist
 
-	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).First()
+	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Select()
 
 	if err != nil {
 		return false, errors.New("playlist not found!")
