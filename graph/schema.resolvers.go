@@ -684,7 +684,7 @@ func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string, fl
 		})
 	}else{
 		sort.Slice(comment[:], func(i, j int) bool {
-			return comment[i].Day+comment[i].Month*30+comment[i].Year*365 > comment[j].Day+comment[j].Month*30+comment[j].Year*365
+			return comment[i].CommentID < comment[i].CommentID
 		})
 	}
 
