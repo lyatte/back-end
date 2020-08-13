@@ -320,7 +320,21 @@ func (r *mutationResolver) UpdatePlaylist(ctx context.Context, playlistID string
 }
 
 func (r *mutationResolver) DeletePlaylist(ctx context.Context, playlistID string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	var playlist model.Playlist
+
+	err := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).First()
+
+	if err != nil {
+		return false, errors.New("playlist not found!")
+	}
+
+	_, deleteErr := r.DB.Model(&playlist).Where("playlist_id = ?", playlistID).Delete()
+
+	if deleteErr != nil {
+		return false, errors.New("Delete playlist failed")
+	}
+
+	return true, nil
 }
 
 func (r *mutationResolver) AddVideoToPlaylist(ctx context.Context, playlistID string, videoID string) (bool, error) {
