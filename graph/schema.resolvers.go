@@ -1745,17 +1745,20 @@ func (r *queryResolver) GetPlaylistVideo(ctx context.Context, videos string, fla
 		}
 	}
 
+	var t []*model.Video
+
 	if flag == "1" { //newest
-		sort.Slice(fin_vids[:], func(i, j int) bool {
-			return fin_vids[i].Day+fin_vids[i].Month*30+fin_vids[i].Year*365 > fin_vids[j].Day+fin_vids[j].Month*30+fin_vids[j].Year*365
-		})
+		return fin_vids, nil
 	} else { //oldest
-		sort.Slice(fin_vids[:], func(i, j int) bool {
-			return fin_vids[i].Day+fin_vids[i].Month*30+fin_vids[i].Year*365 < fin_vids[j].Day+fin_vids[j].Month*30+fin_vids[j].Year*365
-		})
+		var temp = len(fin_vids)-1
+
+		for i:= temp; i>=0; i-- {
+			t = append(t, fin_vids[i])
+		}
+
+		return t, nil
 	}
 
-	return fin_vids, nil
 
 }
 
