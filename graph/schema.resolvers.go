@@ -405,14 +405,14 @@ func (r *mutationResolver) DeleteVideoPlaylist(ctx context.Context, playlistID s
 
 	temp := strings.Split(playlist.PlaylistVideos, ",")
 
-	var newVid string;
+	var newVid string
 
 	for index, _ := range temp {
 		if temp[index] == "" {
 			continue
-		}else if temp[index] == videoID {
+		} else if temp[index] == videoID {
 			continue
-		}else {
+		} else {
 			newVid += temp[index] + ","
 		}
 	}
@@ -668,7 +668,7 @@ func (r *queryResolver) GetVideoByCategory(ctx context.Context, videoCategory st
 	return videos, nil
 }
 
-func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string) ([]*model.Comment, error) {
+func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string, flag string) ([]*model.Comment, error) {
 	var comment []*model.Comment
 
 	err := r.DB.Model(&comment).Where("video_id = ?", videoID).Select()
@@ -676,6 +676,16 @@ func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string) ([
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("Query failed")
+	}
+
+	if flag == "1"{
+		sort.Slice(comment[:], func(i, j int) bool {
+			return comment[i].Like > comment[j].Like
+		})
+	}else{
+		sort.Slice(comment[:], func(i, j int) bool {
+			return comment[i].Day+comment[i].Month*30+comment[i].Year*365 > comment[j].Day+comment[j].Month*30+comment[j].Year*365
+		})
 	}
 
 	return comment, nil

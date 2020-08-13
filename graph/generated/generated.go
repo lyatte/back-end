@@ -157,7 +157,7 @@ type ComplexityRoot struct {
 		GetVideoCategoryWeekPopular    func(childComplexity int, restriction string, premium string, category string) int
 		GetVideoHomePage               func(childComplexity int, restriction string, location string, premiumID string) int
 		GetVideoOrderedByViews         func(childComplexity int) int
-		GetVideosComment               func(childComplexity int, videoID string) int
+		GetVideosComment               func(childComplexity int, videoID string, flag string) int
 	}
 
 	Video struct {
@@ -211,7 +211,7 @@ type QueryResolver interface {
 	GetVideo(ctx context.Context) ([]*model.Video, error)
 	GetVideoByID(ctx context.Context, videoID int) (*model.Video, error)
 	GetVideoByCategory(ctx context.Context, videoCategory string) ([]*model.Video, error)
-	GetVideosComment(ctx context.Context, videoID string) ([]*model.Comment, error)
+	GetVideosComment(ctx context.Context, videoID string, flag string) ([]*model.Comment, error)
 	GetCommentReply(ctx context.Context, commentID string) ([]*model.Comment, error)
 	GetVideoByLocation(ctx context.Context, location string) ([]*model.Video, error)
 	GetVideoByRestriction(ctx context.Context, restriction string) ([]*model.Video, error)
@@ -1198,7 +1198,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetVideosComment(childComplexity, args["video_id"].(string)), true
+		return e.complexity.Query.GetVideosComment(childComplexity, args["video_id"].(string), args["flag"].(string)), true
 
 	case "Video.channel_id":
 		if e.complexity.Video.ChannelID == nil {
@@ -1487,7 +1487,7 @@ type Query{
   getVideoById(video_id: Int!): Video!
   getVideoByCategory(video_category: String!): [Video!]!
 
-  getVideosComment(video_id: ID!): [Comment!]!
+  getVideosComment(video_id: ID!, flag: String!): [Comment!]!
   getCommentReply(comment_id: ID!): [Comment!]!
   getVideoByLocation(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
@@ -2694,6 +2694,14 @@ func (ec *executionContext) field_Query_getVideosComment_args(ctx context.Contex
 		}
 	}
 	args["video_id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["flag"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["flag"] = arg1
 	return args, nil
 }
 
@@ -5305,7 +5313,7 @@ func (ec *executionContext) _Query_getVideosComment(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetVideosComment(rctx, args["video_id"].(string))
+		return ec.resolvers.Query().GetVideosComment(rctx, args["video_id"].(string), args["flag"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -88,7 +88,7 @@ type Query{
   getVideoById(video_id: Int!): Video!
   getVideoByCategory(video_category: String!): [Video!]!
 
-  getVideosComment(video_id: ID!): [Comment!]!
+  getVideosComment(video_id: ID!, flag: String!): [Comment!]!
   getCommentReply(comment_id: ID!): [Comment!]!
   getVideoByLocation(location: String!): [Video!]!
   getVideoByRestriction(restriction: String!): [Video!]!
