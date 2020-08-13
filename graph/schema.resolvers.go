@@ -1011,6 +1011,80 @@ func (r *queryResolver) GetChannelVideo(ctx context.Context, channelID string, f
 	return vid_prem, nil
 }
 
+func (r *queryResolver) GetChannelVideoMostPopular(ctx context.Context, channelID string, flag string) ([]*model.Video, error) {
+	var video []*model.Video
+
+	err1 := r.DB.Model(&video).Where("channel_id = ?", channelID).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return nil, errors.New("Query failed")
+	}
+
+	var video_prem []*model.Video
+
+	for index, _ := range video {
+		if video[index].VideoPremium == "false" {
+			video_prem = append(video_prem, video[index])
+		}
+	}
+
+	if flag == "1" || flag == "2" {
+		for index, _ := range video {
+			if video[index].VideoPremium == "true" {
+				video_prem = append(video_prem, video[index])
+			}
+		}
+	}
+
+	sort.Slice(video_prem[:], func(i, j int) bool {
+		return video_prem[i].VideoViews > video_prem[j].VideoViews
+	})
+
+	return video_prem, nil
+}
+
+func (r *queryResolver) GetChannelVideoDate(ctx context.Context, channelID string, prem string, flag string) ([]*model.Video, error) {
+	var video []*model.Video
+
+	err1 := r.DB.Model(&video).Where("channel_id = ?", channelID).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return nil, errors.New("Query failed")
+	}
+
+	var video_prem []*model.Video
+
+	for index, _ := range video {
+		if video[index].VideoPremium == "false" {
+			video_prem = append(video_prem, video[index])
+		}
+	}
+
+	if prem == "1" || prem == "2" {
+		for index, _ := range video {
+			if video[index].VideoPremium == "true" {
+				video_prem = append(video_prem, video[index])
+			}
+		}
+	}
+
+	if flag == "1"{ //newest
+		sort.Slice(video_prem[:], func(i, j int) bool {
+			return video_prem[i].Day+video_prem[i].Month*30+video_prem[i].Year*365 > video_prem[j].Day+video_prem[j].Month*30+video_prem[j].Year*365
+		})
+	}else{ //oldest
+		sort.Slice(video_prem[:], func(i, j int) bool {
+			return video_prem[i].Day+video_prem[i].Month*30+video_prem[i].Year*365 < video_prem[j].Day+video_prem[j].Month*30+video_prem[j].Year*365
+		})
+	}
+
+
+
+	return video_prem, nil
+}
+
 func (r *queryResolver) GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error) {
 	var playlist model.Playlist
 
@@ -1582,7 +1656,6 @@ func (r *queryResolver) GetChannelRandomVideo(ctx context.Context, channelID str
 				shuffled_vids = append(shuffled_vids, video_prem[0])
 			}
 
-
 			video_prem[temp] = video_prem[len(video_prem)-1]
 			video_prem[len(video_prem)-1] = nil
 			video_prem = video_prem[:len(video_prem)-1]
@@ -1635,7 +1708,6 @@ func (r *queryResolver) GetChannelRandomPlaylist(ctx context.Context, channelID 
 				shuffled_p = append(shuffled_p, playlist2[0])
 			}
 
-
 			playlist2[temp] = playlist2[len(playlist2)-1]
 			playlist2[len(playlist2)-1] = nil
 			playlist2 = playlist2[:len(playlist2)-1]
@@ -1657,3 +1729,11 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+

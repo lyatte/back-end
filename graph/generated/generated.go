@@ -131,6 +131,8 @@ type ComplexityRoot struct {
 		GetChannelRandomPlaylist       func(childComplexity int, channelID string) int
 		GetChannelRandomVideo          func(childComplexity int, channelID string, flag string) int
 		GetChannelVideo                func(childComplexity int, channelID string, flag string) int
+		GetChannelVideoDate            func(childComplexity int, channelID string, prem string, flag string) int
+		GetChannelVideoMostPopular     func(childComplexity int, channelID string, flag string) int
 		GetChannelVideoRecent          func(childComplexity int, channelID string, flag string) int
 		GetCommentReply                func(childComplexity int, commentID string) int
 		GetMemberships                 func(childComplexity int) int
@@ -215,6 +217,8 @@ type QueryResolver interface {
 	GetChannelByID(ctx context.Context, channelID string) (*model.Channel, error)
 	GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error)
 	GetChannelVideo(ctx context.Context, channelID string, flag string) ([]*model.Video, error)
+	GetChannelVideoMostPopular(ctx context.Context, channelID string, flag string) ([]*model.Video, error)
+	GetChannelVideoDate(ctx context.Context, channelID string, prem string, flag string) ([]*model.Video, error)
 	GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error)
 	GetSubscribeVideos(ctx context.Context, channelID []string, flag string) ([]*model.Video, error)
 	GetMemberships(ctx context.Context) ([]*model.Membership, error)
@@ -879,6 +883,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetChannelVideo(childComplexity, args["channel_id"].(string), args["flag"].(string)), true
 
+	case "Query.getChannelVideoDate":
+		if e.complexity.Query.GetChannelVideoDate == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getChannelVideoDate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetChannelVideoDate(childComplexity, args["channel_id"].(string), args["prem"].(string), args["flag"].(string)), true
+
+	case "Query.getChannelVideoMostPopular":
+		if e.complexity.Query.GetChannelVideoMostPopular == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getChannelVideoMostPopular_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetChannelVideoMostPopular(childComplexity, args["channel_id"].(string), args["flag"].(string)), true
+
 	case "Query.getChannelVideoRecent":
 		if e.complexity.Query.GetChannelVideoRecent == nil {
 			break
@@ -1416,6 +1444,9 @@ type Query{
   getChannelById(channel_id: String!): Channel!
   getChannelPlaylist(channel_id: String!): [Playlist!]!
   getChannelVideo(channel_id: String!, flag: String!): [Video!]!
+
+  getChannelVideoMostPopular(channel_id: String!, flag: String!): [Video!]!
+  getChannelVideoDate(channel_id: String!, prem: String!, flag: String!): [Video!]!
 
   getPlaylistById(playlist_id: ID!): Playlist!
 
@@ -2026,6 +2057,58 @@ func (ec *executionContext) field_Query_getChannelRandomPlaylist_args(ctx contex
 }
 
 func (ec *executionContext) field_Query_getChannelRandomVideo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channel_id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["flag"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["flag"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getChannelVideoDate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channel_id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["prem"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["prem"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["flag"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["flag"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getChannelVideoMostPopular_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -5453,6 +5536,88 @@ func (ec *executionContext) _Query_getChannelVideo(ctx context.Context, field gr
 	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_getChannelVideoMostPopular(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getChannelVideoMostPopular_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetChannelVideoMostPopular(rctx, args["channel_id"].(string), args["flag"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getChannelVideoDate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getChannelVideoDate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetChannelVideoDate(rctx, args["channel_id"].(string), args["prem"].(string), args["flag"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_getPlaylistById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8833,6 +8998,34 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getChannelVideo(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getChannelVideoMostPopular":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getChannelVideoMostPopular(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getChannelVideoDate":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getChannelVideoDate(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

@@ -102,6 +102,9 @@ type Query{
   getChannelPlaylist(channel_id: String!): [Playlist!]!
   getChannelVideo(channel_id: String!, flag: String!): [Video!]!
 
+  getChannelVideoMostPopular(channel_id: String!, flag: String!): [Video!]!
+  getChannelVideoDate(channel_id: String!, prem: String!, flag: String!): [Video!]!
+
   getPlaylistById(playlist_id: ID!): Playlist!
 
   getSubscribeVideos(channel_id: [String!]!, flag: String!): [Video!]!
