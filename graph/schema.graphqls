@@ -117,6 +117,10 @@ type Query{
   getSearchPlaylist(keyword: String!, uploadDate: String!): [Playlist!]!
   getSearchChannel(keyword: String!, uploadDate: String!): [Channel!]!
 
+  getChannelVideoRecent(channel_id: String!, flag: String!): [Video!]!
+  getChannelRandomVideo(channel_id: String!, flag: String!): [Video!]!
+  getChannelRandomPlaylist(channel_id: String!): [Playlist!]!
+
 }
 
 input newPlaylist{

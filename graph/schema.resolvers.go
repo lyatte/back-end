@@ -973,8 +973,8 @@ func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string
 
 	var p_vis []*model.Playlist
 
-	for index,_ := range playlists {
-		if playlists[index].PlaylistVisibility == "Public"{
+	for index, _ := range playlists {
+		if playlists[index].PlaylistVisibility == "Public" {
 			p_vis = append(p_vis, playlists[index])
 		}
 	}
@@ -994,15 +994,15 @@ func (r *queryResolver) GetChannelVideo(ctx context.Context, channelID string, f
 
 	var vid_prem []*model.Video
 
-	for index, _ := range video{
-		if video[index].VideoPremium == "false"{
+	for index, _ := range video {
+		if video[index].VideoPremium == "false" {
 			vid_prem = append(vid_prem, video[index])
 		}
 	}
 
 	if flag == "1" || flag == "2" {
-		for index, _ := range video{
-			if video[index].VideoPremium == "true"{
+		for index, _ := range video {
+			if video[index].VideoPremium == "true" {
 				vid_prem = append(vid_prem, video[index])
 			}
 		}
@@ -1500,6 +1500,148 @@ func (r *queryResolver) GetSearchChannel(ctx context.Context, keyword string, up
 	}
 
 	return channel, nil
+}
+
+func (r *queryResolver) GetChannelVideoRecent(ctx context.Context, channelID string, flag string) ([]*model.Video, error) {
+	var video []*model.Video
+
+	err1 := r.DB.Model(&video).Where("channel_id = ?", channelID).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return nil, errors.New("Query failed")
+	}
+
+	var video_prem []*model.Video
+
+
+	if flag == "1" || flag == "2" {
+		for index, _ := range video {
+			if video[index].VideoPremium == "true" {
+				video_prem = append(video_prem, video[index])
+			}
+		}
+	}
+
+	sort.Slice(video_prem[:], func(i, j int) bool {
+		return video_prem[i].Day+video_prem[i].Month*30+video_prem[i].Year*365 > video_prem[j].Day+video_prem[j].Month*30+video_prem[j].Year*365
+	})
+
+	return video_prem, nil
+}
+
+func (r *queryResolver) GetChannelRandomVideo(ctx context.Context, channelID string, flag string) ([]*model.Video, error) {
+	var vid []*model.Video
+
+	var video_prem []*model.Video
+
+	err := r.DB.Model(&vid).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("asd Query failed")
+	}
+
+	for index, _ := range vid {
+		if vid[index].VideoPremium == "false" {
+			video_prem = append(video_prem, vid[index])
+		}
+	}
+
+	if flag == "1" || flag == "2" {
+		for index, _ := range vid {
+			if vid[index].VideoPremium == "true" {
+				video_prem = append(video_prem, vid[index])
+			}
+		}
+	}
+
+	var temp int
+
+	var shuffled_vids []*model.Video
+
+	var i int
+
+	i = len(video_prem) - 1
+
+	for {
+		if i >= 0 {
+			rand.Seed(time.Now().Unix())
+
+			//log.Println(len(video2))
+
+			if (len(video_prem) - 1) != 0 {
+				temp = rand.Intn(len(video_prem) - 1)
+				shuffled_vids = append(shuffled_vids, video_prem[temp])
+			} else {
+				shuffled_vids = append(shuffled_vids, video_prem[0])
+			}
+
+
+			video_prem[temp] = video_prem[len(video_prem)-1]
+			video_prem[len(video_prem)-1] = nil
+			video_prem = video_prem[:len(video_prem)-1]
+
+			i -= 1
+			continue
+		}
+		break
+	}
+
+	return shuffled_vids, nil
+}
+
+func (r *queryResolver) GetChannelRandomPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error) {
+	var playlist []*model.Playlist
+
+	err := r.DB.Model(&playlist).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("asd Query failed")
+	}
+
+	var playlist2 []*model.Playlist
+
+	for index, _ := range playlist {
+		if playlist[index].PlaylistVisibility == "Public" {
+			playlist2 = append(playlist2, playlist[index])
+		}
+	}
+
+	var temp int
+
+	var shuffled_p []*model.Playlist
+
+	var i int
+
+	i = len(playlist2) - 1
+
+	for {
+		if i >= 0 {
+			rand.Seed(time.Now().Unix())
+
+			//log.Println(len(video2))
+
+			if (len(playlist2) - 1) != 0 {
+				temp = rand.Intn(len(playlist2) - 1)
+				shuffled_p = append(shuffled_p, playlist2[temp])
+			} else {
+				shuffled_p = append(shuffled_p, playlist2[0])
+			}
+
+
+			playlist2[temp] = playlist2[len(playlist2)-1]
+			playlist2[len(playlist2)-1] = nil
+			playlist2 = playlist2[:len(playlist2)-1]
+
+			i -= 1
+			continue
+		}
+		break
+	}
+
+	return shuffled_p, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
