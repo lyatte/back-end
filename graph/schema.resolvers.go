@@ -1304,6 +1304,219 @@ func (r *queryResolver) GetVideoCategoryRecently(ctx context.Context, restrictio
 	return video_prem, nil
 }
 
+func (r *queryResolver) GetSearchVideo(ctx context.Context, keyword string, uploadDate string, premium string) ([]*model.Video, error) {
+	var video []*model.Video
+
+	key := "%" + keyword + "%"
+
+	err := r.DB.Model(&video).Where("LOWER(video_title) LIKE LOWER(?)", key).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	var video_res []*model.Video
+
+	for index, _ := range video {
+		if video[index].VideoPremium == "false"{
+			video_res = append(video_res, video[index])
+		}
+	}
+
+
+
+	if premium == "1" || premium == "2" {
+		for index, _ := range video {
+			if video[index].VideoPremium == "true"{
+				video_res = append(video_res, video[index])
+			}
+		}
+	}
+
+	date := time.Now()
+
+	day := date.Day()
+	month := int(date.Month())
+	year := date.Year()
+
+	var final_array []*model.Video
+
+	if uploadDate == "1" {
+		month *= 30
+		year *= 365
+
+		for index, _ := range video_res {
+			if (day+month+year)-(video_res[index].Day+video_res[index].Month*30+video_res[index].Year*365) < 7 {
+				final_array = append(final_array, video_res[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
+		})
+	} else if uploadDate == "2" {
+		month *= 30
+		year *= 365
+
+		for index, _ := range video_res {
+			if (day+month+year)-(video_res[index].Day+video_res[index].Month*30+video_res[index].Year*365) < 30 {
+				final_array = append(final_array, video_res[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
+		})
+
+	} else {
+		month *= 30
+		year *= 365
+
+		for index, _ := range video_res {
+			if (day+month+year)-(video_res[index].Day+video_res[index].Month*30+video_res[index].Year*365) < 365 {
+				final_array = append(final_array, video_res[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
+		})
+	}
+
+	return final_array, nil
+}
+
+func (r *queryResolver) GetSearchPlaylist(ctx context.Context, keyword string, uploadDate string) ([]*model.Playlist, error) {
+	var playlist []*model.Playlist
+
+	key := "%" + keyword + "%"
+
+	err := r.DB.Model(&playlist).Where("LOWER(playlist_title) LIKE LOWER(?)", key).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	date := time.Now()
+
+	day := date.Day()
+	month := int(date.Month())
+	year := date.Year()
+
+	var final_array []*model.Playlist
+
+	if uploadDate == "1" {
+		month *= 30
+		year *= 365
+
+		for index, _ := range playlist {
+			if (day+month+year)-(playlist[index].PlaylistDay+playlist[index].PlaylistMonth*30+playlist[index].PlaylistYear*365) < 7 {
+				final_array = append(final_array, playlist[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].PlaylistDay+final_array[i].PlaylistMonth*30+final_array[i].PlaylistYear*365 > final_array[j].PlaylistDay+final_array[j].PlaylistMonth*30+final_array[j].PlaylistYear*365
+		})
+	} else if uploadDate == "2" {
+		month *= 30
+		year *= 365
+
+		for index, _ := range playlist {
+			if (day+month+year)-(playlist[index].PlaylistDay+playlist[index].PlaylistMonth*30+playlist[index].PlaylistYear*365) < 30 {
+				final_array = append(final_array, playlist[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].PlaylistDay+final_array[i].PlaylistMonth*30+final_array[i].PlaylistYear*365 > final_array[j].PlaylistDay+final_array[j].PlaylistMonth*30+final_array[j].PlaylistYear*365
+		})
+
+	} else {
+		month *= 30
+		year *= 365
+
+		for index, _ := range playlist {
+			if (day+month+year)-(playlist[index].PlaylistDay+playlist[index].PlaylistMonth*30+playlist[index].PlaylistYear*365) < 365 {
+				final_array = append(final_array, playlist[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].PlaylistDay+final_array[i].PlaylistMonth*30+final_array[i].PlaylistYear*365 > final_array[j].PlaylistDay+final_array[j].PlaylistMonth*30+final_array[j].PlaylistYear*365
+		})
+	}
+
+	return final_array, nil
+}
+
+func (r *queryResolver) GetSearchChannel(ctx context.Context, keyword string, uploadDate string) ([]*model.Channel, error) {
+	var channel []*model.Channel
+
+	key := "%" + keyword + "%"
+
+	err := r.DB.Model(&channel).Where("LOWER(channel_name) LIKE LOWER(?)", key).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Query failed")
+	}
+
+	date := time.Now()
+
+	day := date.Day()
+	month := int(date.Month())
+	year := date.Year()
+
+	var final_array []*model.Channel
+
+	if uploadDate == "1" {
+		month *= 30
+		year *= 365
+
+		for index, _ := range channel {
+			if (day+month+year)-(channel[index].ChannelJoinDateDay+channel[index].ChannelJoinDateMonth*30+channel[index].ChannelJoinDateYear*365) < 7 {
+				final_array = append(final_array, channel[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].ChannelJoinDateDay+final_array[i].ChannelJoinDateMonth*30+final_array[i].ChannelJoinDateYear*365 > final_array[j].ChannelJoinDateDay+final_array[j].ChannelJoinDateMonth*30+final_array[j].ChannelJoinDateYear*365
+		})
+	} else if uploadDate == "2" {
+		month *= 30
+		year *= 365
+
+		for index, _ := range channel {
+			if (day+month+year)-(channel[index].ChannelJoinDateDay+channel[index].ChannelJoinDateMonth*30+channel[index].ChannelJoinDateYear*365) < 30 {
+				final_array = append(final_array, channel[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].ChannelJoinDateDay+final_array[i].ChannelJoinDateMonth*30+final_array[i].ChannelJoinDateYear*365 > final_array[j].ChannelJoinDateDay+final_array[j].ChannelJoinDateMonth*30+final_array[j].ChannelJoinDateYear*365
+		})
+
+	} else {
+		month *= 30
+		year *= 365
+
+		for index, _ := range channel {
+			if (day+month+year)-(channel[index].ChannelJoinDateDay+channel[index].ChannelJoinDateMonth*30+channel[index].ChannelJoinDateYear*365) < 365 {
+				final_array = append(final_array, channel[index])
+			}
+		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].ChannelJoinDateDay+final_array[i].ChannelJoinDateMonth*30+final_array[i].ChannelJoinDateYear*365 > final_array[j].ChannelJoinDateDay+final_array[j].ChannelJoinDateMonth*30+final_array[j].ChannelJoinDateYear*365
+		})
+	}
+
+	return final_array, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

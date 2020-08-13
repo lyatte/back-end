@@ -112,6 +112,10 @@ type Query{
   getVideoCategoryMonthPopular(restriction: String!, premium: String!, category: String!): [Video!]!
   getVideoCategoryRecently(restriction: String!, premium: String!, category: String!): [Video!]!
 
+  getSearchVideo(keyword: String!, uploadDate: String!, premium: String!): [Video!]!
+  getSearchPlaylist(keyword: String!, uploadDate: String!): [Playlist!]!
+  getSearchChannel(keyword: String!, uploadDate: String!): [Channel!]!
+
 }
 
 input newPlaylist{

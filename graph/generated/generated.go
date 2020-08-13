@@ -132,6 +132,9 @@ type ComplexityRoot struct {
 		GetMemberships                 func(childComplexity int) int
 		GetPlaylistByID                func(childComplexity int, playlistID string) int
 		GetRelatedVideo                func(childComplexity int, restriction string, premiumID string, location string, category string) int
+		GetSearchChannel               func(childComplexity int, keyword string, uploadDate string) int
+		GetSearchPlaylist              func(childComplexity int, keyword string, uploadDate string) int
+		GetSearchVideo                 func(childComplexity int, keyword string, uploadDate string, premium string) int
 		GetSubscribeVideos             func(childComplexity int, channelID []string, flag string) int
 		GetVideo                       func(childComplexity int) int
 		GetVideoByCategory             func(childComplexity int, videoCategory string) int
@@ -214,6 +217,9 @@ type QueryResolver interface {
 	GetVideoCategoryWeekPopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
 	GetVideoCategoryMonthPopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
 	GetVideoCategoryRecently(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
+	GetSearchVideo(ctx context.Context, keyword string, uploadDate string, premium string) ([]*model.Video, error)
+	GetSearchPlaylist(ctx context.Context, keyword string, uploadDate string) ([]*model.Playlist, error)
+	GetSearchChannel(ctx context.Context, keyword string, uploadDate string) ([]*model.Channel, error)
 }
 
 type executableSchema struct {
@@ -872,6 +878,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetRelatedVideo(childComplexity, args["restriction"].(string), args["premium_id"].(string), args["location"].(string), args["category"].(string)), true
 
+	case "Query.getSearchChannel":
+		if e.complexity.Query.GetSearchChannel == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getSearchChannel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetSearchChannel(childComplexity, args["keyword"].(string), args["uploadDate"].(string)), true
+
+	case "Query.getSearchPlaylist":
+		if e.complexity.Query.GetSearchPlaylist == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getSearchPlaylist_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetSearchPlaylist(childComplexity, args["keyword"].(string), args["uploadDate"].(string)), true
+
+	case "Query.getSearchVideo":
+		if e.complexity.Query.GetSearchVideo == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getSearchVideo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetSearchVideo(childComplexity, args["keyword"].(string), args["uploadDate"].(string), args["premium"].(string)), true
+
 	case "Query.getSubscribeVideos":
 		if e.complexity.Query.GetSubscribeVideos == nil {
 			break
@@ -1328,6 +1370,10 @@ type Query{
   getVideoCategoryWeekPopular(restriction: String!, premium: String!, category: String!): [Video!]!
   getVideoCategoryMonthPopular(restriction: String!, premium: String!, category: String!): [Video!]!
   getVideoCategoryRecently(restriction: String!, premium: String!, category: String!): [Video!]!
+
+  getSearchVideo(keyword: String!, uploadDate: String!, premium: String!): [Video!]!
+  getSearchPlaylist(keyword: String!, uploadDate: String!): [Playlist!]!
+  getSearchChannel(keyword: String!, uploadDate: String!): [Channel!]!
 
 }
 
@@ -1967,6 +2013,80 @@ func (ec *executionContext) field_Query_getRelatedVideo_args(ctx context.Context
 		}
 	}
 	args["category"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getSearchChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keyword"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["uploadDate"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uploadDate"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getSearchPlaylist_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keyword"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["uploadDate"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uploadDate"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getSearchVideo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keyword"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["uploadDate"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uploadDate"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["premium"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["premium"] = arg2
 	return args, nil
 }
 
@@ -5431,6 +5551,129 @@ func (ec *executionContext) _Query_getVideoCategoryRecently(ctx context.Context,
 	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_getSearchVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getSearchVideo_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetSearchVideo(rctx, args["keyword"].(string), args["uploadDate"].(string), args["premium"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getSearchPlaylist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getSearchPlaylist_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetSearchPlaylist(rctx, args["keyword"].(string), args["uploadDate"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Playlist)
+	fc.Result = res
+	return ec.marshalNPlaylist2ᚕᚖback_endᚋgraphᚋmodelᚐPlaylistᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getSearchChannel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getSearchChannel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetSearchChannel(rctx, args["keyword"].(string), args["uploadDate"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Channel)
+	fc.Result = res
+	return ec.marshalNChannel2ᚕᚖback_endᚋgraphᚋmodelᚐChannelᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8369,6 +8612,48 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getVideoCategoryRecently(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getSearchVideo":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getSearchVideo(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getSearchPlaylist":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getSearchPlaylist(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getSearchChannel":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getSearchChannel(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
