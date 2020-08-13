@@ -124,6 +124,10 @@ type Query{
   getChannelRandomVideo(channel_id: String!, flag: String!): [Video!]!
   getChannelRandomPlaylist(channel_id: String!): [Playlist!]!
 
+  getPlaylistVideo(videos: String!, flag: String!): [Video!]!
+  getPlaylistVideoDP(videos: String!, flag: String!): [Video!]!
+  getPlaylistVideoPopularity(videos: String!): [Video!]!
+
 }
 
 input newPlaylist{

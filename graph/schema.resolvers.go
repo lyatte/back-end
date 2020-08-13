@@ -1070,17 +1070,15 @@ func (r *queryResolver) GetChannelVideoDate(ctx context.Context, channelID strin
 		}
 	}
 
-	if flag == "1"{ //newest
+	if flag == "1" { //newest
 		sort.Slice(video_prem[:], func(i, j int) bool {
 			return video_prem[i].Day+video_prem[i].Month*30+video_prem[i].Year*365 > video_prem[j].Day+video_prem[j].Month*30+video_prem[j].Year*365
 		})
-	}else{ //oldest
+	} else { //oldest
 		sort.Slice(video_prem[:], func(i, j int) bool {
 			return video_prem[i].Day+video_prem[i].Month*30+video_prem[i].Year*365 < video_prem[j].Day+video_prem[j].Month*30+video_prem[j].Year*365
 		})
 	}
-
-
 
 	return video_prem, nil
 }
@@ -1721,6 +1719,110 @@ func (r *queryResolver) GetChannelRandomPlaylist(ctx context.Context, channelID 
 	return shuffled_p, nil
 }
 
+func (r *queryResolver) GetPlaylistVideo(ctx context.Context, videos string, flag string) ([]*model.Video, error) {
+	var vid []*model.Video
+
+	err := r.DB.Model(&vid).Order("channel_id").Select()
+
+	if err != nil {
+		return nil, errors.New("asd Query failed")
+	}
+
+	temp := strings.Split(videos, ",")
+
+	var fin_vids []*model.Video
+
+	for index,_ := range temp {
+		for i, _ := range vid {
+			if temp[index] == "" {
+				continue
+			}
+			log.Println(temp[index])
+
+			if temp[index] == vid[i].VideoID {
+				fin_vids = append(fin_vids, vid[i])
+			}
+		}
+	}
+
+	return fin_vids, nil
+
+}
+
+func (r *queryResolver) GetPlaylistVideoDp(ctx context.Context, videos string, flag string) ([]*model.Video, error) {
+	var vid []*model.Video
+
+	err := r.DB.Model(&vid).Order("channel_id").Select()
+
+	if err != nil {
+		return nil, errors.New("asd Query failed")
+	}
+
+	temp := strings.Split(videos, ",")
+
+	var fin_vids []*model.Video
+
+	for index,_ := range temp {
+		for i, _ := range vid {
+			if temp[index] == "" {
+				continue
+			}
+			log.Println(temp[index])
+
+			if temp[index] == vid[i].VideoID {
+				fin_vids = append(fin_vids, vid[i])
+			}
+		}
+	}
+
+	if flag == "1" { //newest
+		sort.Slice(fin_vids[:], func(i, j int) bool {
+			return fin_vids[i].Day+fin_vids[i].Month*30+fin_vids[i].Year*365 > fin_vids[j].Day+fin_vids[j].Month*30+fin_vids[j].Year*365
+		})
+	} else { //oldest
+		sort.Slice(fin_vids[:], func(i, j int) bool {
+			return fin_vids[i].Day+fin_vids[i].Month*30+fin_vids[i].Year*365 < fin_vids[j].Day+fin_vids[j].Month*30+fin_vids[j].Year*365
+		})
+	}
+
+
+
+	return fin_vids, nil
+}
+
+func (r *queryResolver) GetPlaylistVideoPopularity(ctx context.Context, videos string) ([]*model.Video, error) {
+	var vid []*model.Video
+
+	err := r.DB.Model(&vid).Order("channel_id").Select()
+
+	if err != nil {
+		return nil, errors.New("asd Query failed")
+	}
+
+	temp := strings.Split(videos, ",")
+
+	var fin_vids []*model.Video
+
+	for index,_ := range temp {
+		for i, _ := range vid {
+			if temp[index] == "" {
+				continue
+			}
+			log.Println(temp[index])
+
+			if temp[index] == vid[i].VideoID {
+				fin_vids = append(fin_vids, vid[i])
+			}
+		}
+	}
+
+	sort.Slice(fin_vids[:], func(i, j int) bool {
+		return fin_vids[i].VideoViews > fin_vids[j].VideoViews
+	})
+
+	return fin_vids, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -1729,11 +1831,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-

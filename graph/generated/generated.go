@@ -137,6 +137,9 @@ type ComplexityRoot struct {
 		GetCommentReply                func(childComplexity int, commentID string) int
 		GetMemberships                 func(childComplexity int) int
 		GetPlaylistByID                func(childComplexity int, playlistID string) int
+		GetPlaylistVideo               func(childComplexity int, videos string, flag string) int
+		GetPlaylistVideoDp             func(childComplexity int, videos string, flag string) int
+		GetPlaylistVideoPopularity     func(childComplexity int, videos string) int
 		GetRelatedVideo                func(childComplexity int, restriction string, premiumID string, location string, category string) int
 		GetSearchChannel               func(childComplexity int, keyword string, uploadDate string) int
 		GetSearchPlaylist              func(childComplexity int, keyword string, uploadDate string) int
@@ -232,6 +235,9 @@ type QueryResolver interface {
 	GetChannelVideoRecent(ctx context.Context, channelID string, flag string) ([]*model.Video, error)
 	GetChannelRandomVideo(ctx context.Context, channelID string, flag string) ([]*model.Video, error)
 	GetChannelRandomPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error)
+	GetPlaylistVideo(ctx context.Context, videos string, flag string) ([]*model.Video, error)
+	GetPlaylistVideoDp(ctx context.Context, videos string, flag string) ([]*model.Video, error)
+	GetPlaylistVideoPopularity(ctx context.Context, videos string) ([]*model.Video, error)
 }
 
 type executableSchema struct {
@@ -950,6 +956,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetPlaylistByID(childComplexity, args["playlist_id"].(string)), true
 
+	case "Query.getPlaylistVideo":
+		if e.complexity.Query.GetPlaylistVideo == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getPlaylistVideo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetPlaylistVideo(childComplexity, args["videos"].(string), args["flag"].(string)), true
+
+	case "Query.getPlaylistVideoDP":
+		if e.complexity.Query.GetPlaylistVideoDp == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getPlaylistVideoDP_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetPlaylistVideoDp(childComplexity, args["videos"].(string), args["flag"].(string)), true
+
+	case "Query.getPlaylistVideoPopularity":
+		if e.complexity.Query.GetPlaylistVideoPopularity == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getPlaylistVideoPopularity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetPlaylistVideoPopularity(childComplexity, args["videos"].(string)), true
+
 	case "Query.getRelatedVideo":
 		if e.complexity.Query.GetRelatedVideo == nil {
 			break
@@ -1466,6 +1508,10 @@ type Query{
   getChannelVideoRecent(channel_id: String!, flag: String!): [Video!]!
   getChannelRandomVideo(channel_id: String!, flag: String!): [Video!]!
   getChannelRandomPlaylist(channel_id: String!): [Playlist!]!
+
+  getPlaylistVideo(videos: String!, flag: String!): [Video!]!
+  getPlaylistVideoDP(videos: String!, flag: String!): [Video!]!
+  getPlaylistVideoPopularity(videos: String!): [Video!]!
 
 }
 
@@ -2199,6 +2245,64 @@ func (ec *executionContext) field_Query_getPlaylistById_args(ctx context.Context
 		}
 	}
 	args["playlist_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getPlaylistVideoDP_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["videos"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["videos"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["flag"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["flag"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getPlaylistVideoPopularity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["videos"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["videos"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getPlaylistVideo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["videos"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["videos"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["flag"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["flag"] = arg1
 	return args, nil
 }
 
@@ -6144,6 +6248,129 @@ func (ec *executionContext) _Query_getChannelRandomPlaylist(ctx context.Context,
 	return ec.marshalNPlaylist2ᚕᚖback_endᚋgraphᚋmodelᚐPlaylistᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_getPlaylistVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getPlaylistVideo_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetPlaylistVideo(rctx, args["videos"].(string), args["flag"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getPlaylistVideoDP(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getPlaylistVideoDP_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetPlaylistVideoDp(rctx, args["videos"].(string), args["flag"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getPlaylistVideoPopularity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getPlaylistVideoPopularity_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetPlaylistVideoPopularity(rctx, args["videos"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖback_endᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9208,6 +9435,48 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getChannelRandomPlaylist(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getPlaylistVideo":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getPlaylistVideo(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getPlaylistVideoDP":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getPlaylistVideoDP(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getPlaylistVideoPopularity":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getPlaylistVideoPopularity(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
