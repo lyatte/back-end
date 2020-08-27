@@ -265,7 +265,7 @@ func (r *mutationResolver) UnsubscribeChannel(ctx context.Context, channelID str
 	var temp2 string
 
 	for index, _ := range temp {
-		if temp[index] != chSubs {
+		if temp[index] != chSubs{
 			temp2 += temp[index] + ","
 		}
 		log.Println(temp[index])
@@ -1542,7 +1542,7 @@ func (r *queryResolver) GetSearchVideo(ctx context.Context, keyword string, uplo
 			return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
 		})
 
-	} else {
+	} else if uploadDate == "3"{
 		month *= 30
 		year *= 365
 
@@ -1551,6 +1551,12 @@ func (r *queryResolver) GetSearchVideo(ctx context.Context, keyword string, uplo
 				final_array = append(final_array, video_res[index])
 			}
 		}
+
+		sort.Slice(final_array[:], func(i, j int) bool {
+			return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
+		})
+	} else {
+		final_array = append(final_array, video_res...)
 
 		sort.Slice(final_array[:], func(i, j int) bool {
 			return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
