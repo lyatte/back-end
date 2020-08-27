@@ -996,7 +996,13 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 
 	final_vids = append(final_vids, video...)
 
-	final_vids = append(final_vids, video2...)
+	for index, _ := range video2 {
+		for i, _ := range final_vids{
+			if final_vids[i].VideoID != video2[index].VideoID {
+				final_vids = append(final_vids, video2[index])
+			}
+		}
+	}
 
 	return final_vids, nil
 }
