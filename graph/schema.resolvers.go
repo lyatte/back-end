@@ -1004,6 +1004,8 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 		}
 	}
 
+	log.Println("asdasd")
+
 	return final_vids, nil
 }
 
