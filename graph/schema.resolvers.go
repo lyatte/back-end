@@ -265,7 +265,7 @@ func (r *mutationResolver) UnsubscribeChannel(ctx context.Context, channelID str
 	var temp2 string
 
 	for index, _ := range temp {
-		if temp[index] != chSubs{
+		if temp[index] != chSubs {
 			temp2 += temp[index] + ","
 		}
 		log.Println(temp[index])
@@ -678,15 +678,14 @@ func (r *queryResolver) GetVideosComment(ctx context.Context, videoID string, fl
 		return nil, errors.New("Query failed")
 	}
 
-
-	if flag == "1"{
+	if flag == "1" {
 		sort.Slice(comment[:], func(i, j int) bool {
 			return comment[i].Like > comment[j].Like
 		})
-	}else{
+	} else {
 		var temp []*model.Comment
 
-		for i:= len(comment)-1; i>=0; i--{
+		for i := len(comment) - 1; i >= 0; i-- {
 			temp = append(temp, comment[i])
 		}
 
@@ -997,8 +996,9 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 	final_vids = append(final_vids, video...)
 
 	for index, _ := range video2 {
-		for i, _ := range final_vids{
+		for i, _ := range final_vids {
 			if final_vids[i].VideoID != video2[index].VideoID {
+				log.Println("mausk sini")
 				final_vids = append(final_vids, video2[index])
 			}
 		}
@@ -1170,7 +1170,7 @@ func (r *queryResolver) GetPlaylistByID(ctx context.Context, playlistID string) 
 	return &playlist, nil
 }
 
-func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []string, flag string) ([]*model.Video, error) {
+func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []string, flag string, premium string) ([]*model.Video, error) {
 	var channel model.Channel
 
 	var final_array []*model.Video
@@ -1195,6 +1195,22 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 			return nil, errors.New("Query failed")
 		}
 
+		var video_prem []*model.Video
+
+		for index, _ := range video {
+			if video[index].VideoPremium == "false" {
+				video_prem = append(video_prem, video[index])
+			}
+		}
+
+		if premium == "1" || premium == "2" {
+			for index, _ := range video {
+				if video[index].VideoPremium == "true" {
+					video_prem = append(video_prem, video[index])
+				}
+			}
+		}
+
 		date := time.Now()
 
 		day := date.Day()
@@ -1202,9 +1218,9 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 		year := date.Year()
 
 		if flag == "1" {
-			for index, _ := range video {
-				if video[index].Day == day && video[index].Month*30 == month*30 && video[index].Year*365 == year*365 {
-					final_array = append(final_array, video[index])
+			for index, _ := range video_prem {
+				if video_prem[index].Day == day && video_prem[index].Month*30 == month*30 && video_prem[index].Year*365 == year*365 {
+					final_array = append(final_array, video_prem[index])
 				}
 			}
 		} else if flag == "2" {
@@ -1212,10 +1228,10 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 			month *= 30
 			year *= 365
 
-			for index, _ := range video {
-				if (day+month+year)-(video[index].Day+video[index].Month*30+video[index].Year*365) < 7 {
+			for index, _ := range video_prem {
+				if (day+month+year)-(video_prem[index].Day+video_prem[index].Month*30+video_prem[index].Year*365) < 7 {
 					log.Println((day + month + year) - (date.Day() + int(date.Month())*30 + date.Year()*365))
-					final_array = append(final_array, video[index])
+					final_array = append(final_array, video_prem[index])
 				}
 			}
 
@@ -1226,10 +1242,10 @@ func (r *queryResolver) GetSubscribeVideos(ctx context.Context, channelID []stri
 			month *= 30
 			year *= 365
 
-			for index, _ := range video {
-				if (day+month+year)-(video[index].Day+video[index].Month*30+video[index].Year*365) < 30 {
+			for index, _ := range video_prem {
+				if (day+month+year)-(video_prem[index].Day+video_prem[index].Month*30+video_prem[index].Year*365) < 30 {
 					log.Println((day + month + year) - (date.Day() + int(date.Month())*30 + date.Year()*365))
-					final_array = append(final_array, video[index])
+					final_array = append(final_array, video_prem[index])
 				}
 			}
 
@@ -1550,7 +1566,7 @@ func (r *queryResolver) GetSearchVideo(ctx context.Context, keyword string, uplo
 			return final_array[i].Day+final_array[i].Month*30+final_array[i].Year*365 > final_array[j].Day+final_array[j].Month*30+final_array[j].Year*365
 		})
 
-	} else if uploadDate == "3"{
+	} else if uploadDate == "3" {
 		month *= 30
 		year *= 365
 

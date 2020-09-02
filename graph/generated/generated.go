@@ -145,7 +145,7 @@ type ComplexityRoot struct {
 		GetSearchChannel               func(childComplexity int, keyword string, uploadDate string) int
 		GetSearchPlaylist              func(childComplexity int, keyword string, uploadDate string) int
 		GetSearchVideo                 func(childComplexity int, keyword string, uploadDate string, premium string) int
-		GetSubscribeVideos             func(childComplexity int, channelID []string, flag string) int
+		GetSubscribeVideos             func(childComplexity int, channelID []string, flag string, premium string) int
 		GetVideo                       func(childComplexity int) int
 		GetVideoByCategory             func(childComplexity int, videoCategory string) int
 		GetVideoByID                   func(childComplexity int, videoID int) int
@@ -225,7 +225,7 @@ type QueryResolver interface {
 	GetChannelVideoMostPopular(ctx context.Context, channelID string, flag string) ([]*model.Video, error)
 	GetChannelVideoDate(ctx context.Context, channelID string, prem string, flag string) ([]*model.Video, error)
 	GetPlaylistByID(ctx context.Context, playlistID string) (*model.Playlist, error)
-	GetSubscribeVideos(ctx context.Context, channelID []string, flag string) ([]*model.Video, error)
+	GetSubscribeVideos(ctx context.Context, channelID []string, flag string, premium string) ([]*model.Video, error)
 	GetMemberships(ctx context.Context) ([]*model.Membership, error)
 	GetVideoCategoryAllTimePopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
 	GetVideoCategoryWeekPopular(ctx context.Context, restriction string, premium string, category string) ([]*model.Video, error)
@@ -1064,7 +1064,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetSubscribeVideos(childComplexity, args["channel_id"].([]string), args["flag"].(string)), true
+		return e.complexity.Query.GetSubscribeVideos(childComplexity, args["channel_id"].([]string), args["flag"].(string), args["premium"].(string)), true
 
 	case "Query.getVideo":
 		if e.complexity.Query.GetVideo == nil {
@@ -1506,7 +1506,7 @@ type Query{
 
   getPlaylistById(playlist_id: ID!): Playlist!
 
-  getSubscribeVideos(channel_id: [String!]!, flag: String!): [Video!]!
+  getSubscribeVideos(channel_id: [String!]!, flag: String!, premium: String!): [Video!]!
 
   getMemberships: [Membership!]!
 
@@ -2474,6 +2474,14 @@ func (ec *executionContext) field_Query_getSubscribeVideos_args(ctx context.Cont
 		}
 	}
 	args["flag"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["premium"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["premium"] = arg2
 	return args, nil
 }
 
@@ -5873,7 +5881,7 @@ func (ec *executionContext) _Query_getSubscribeVideos(ctx context.Context, field
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetSubscribeVideos(rctx, args["channel_id"].([]string), args["flag"].(string))
+		return ec.resolvers.Query().GetSubscribeVideos(rctx, args["channel_id"].([]string), args["flag"].(string), args["premium"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

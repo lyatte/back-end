@@ -107,7 +107,7 @@ type Query{
 
   getPlaylistById(playlist_id: ID!): Playlist!
 
-  getSubscribeVideos(channel_id: [String!]!, flag: String!): [Video!]!
+  getSubscribeVideos(channel_id: [String!]!, flag: String!, premium: String!): [Video!]!
 
   getMemberships: [Membership!]!
 
