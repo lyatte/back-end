@@ -995,16 +995,83 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 
 	final_vids = append(final_vids, video...)
 
-	for index, _ := range video2 {
-		for i, _ := range final_vids {
-			if final_vids[i].VideoID != video2[index].VideoID {
-				log.Println("mausk sini")
-				final_vids = append(final_vids, video2[index])
+
+
+	//
+	//var tempString = ""
+
+
+	//for {
+	//	log.Println("hereeee")
+	//
+	//	for i := 0 ; i< len(final_vids)-1 ; i++ {
+	//		log.Println("hm")
+	//		log.Println("f ", final_vids[i].VideoID)
+	//		log.Println("v ", video2[tempLength].VideoID)
+	//		if final_vids[i].VideoID == video2[tempLength].VideoID {
+	//			log.Println("waa samaa")
+	//			tempString += final_vids[i].VideoID + ","
+	//
+	//			break
+	//		}
+	//	}
+	//	tempLength--
+	//
+	//	if tempLength < 0 {
+	//		log.Println(tempString)
+	//		break
+	//	}
+	//
+	//}
+	//
+	//temp := strings.Split(tempString, ",")
+	//
+	//video2[temp] = video2[len(video2)-1]
+	//video2[len(video2)-1] = nil
+	//video2 = video2[:len(video2)-1]
+	//
+	//i -= 1
+	//
+	//final_vids = append(final_vids, video2...)
+
+	var tempLength = len(video2)-1
+
+	var temp []*model.Video
+
+	var isSame bool
+
+	log.Println(tempLength)
+
+	for {
+		isSame = false
+		for i := 0 ; i< len(final_vids)-1 ; i++ {
+			log.Println(i)
+			if final_vids[i].VideoID == video2[tempLength].VideoID {
+				log.Println("waa samaa")
+
+				isSame = true
+
+
+				break
 			}
 		}
+
+		if !isSame {
+			temp = append(temp, video2[tempLength])
+		}
+
+		tempLength--
+
+
+
+		if tempLength < 0 {
+			log.Println(temp)
+			break
+		}
+
 	}
 
-	log.Println("asdasd")
+	final_vids = append(final_vids, temp...)
 
 	return final_vids, nil
 }
@@ -1036,6 +1103,8 @@ func (r *queryResolver) GetChannelByID(ctx context.Context, channelID string) (*
 }
 
 func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error) {
+
+
 	var playlists []*model.Playlist
 
 	err := r.DB.Model(&playlists).Where("channel_id = ?", channelID).Select()
