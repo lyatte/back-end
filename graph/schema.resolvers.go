@@ -995,45 +995,6 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 
 	final_vids = append(final_vids, video...)
 
-
-
-	//
-	//var tempString = ""
-
-
-	//for {
-	//	log.Println("hereeee")
-	//
-	//	for i := 0 ; i< len(final_vids)-1 ; i++ {
-	//		log.Println("hm")
-	//		log.Println("f ", final_vids[i].VideoID)
-	//		log.Println("v ", video2[tempLength].VideoID)
-	//		if final_vids[i].VideoID == video2[tempLength].VideoID {
-	//			log.Println("waa samaa")
-	//			tempString += final_vids[i].VideoID + ","
-	//
-	//			break
-	//		}
-	//	}
-	//	tempLength--
-	//
-	//	if tempLength < 0 {
-	//		log.Println(tempString)
-	//		break
-	//	}
-	//
-	//}
-	//
-	//temp := strings.Split(tempString, ",")
-	//
-	//video2[temp] = video2[len(video2)-1]
-	//video2[len(video2)-1] = nil
-	//video2 = video2[:len(video2)-1]
-	//
-	//i -= 1
-	//
-	//final_vids = append(final_vids, video2...)
-
 	var tempLength = len(video2)-1
 
 	var temp []*model.Video
