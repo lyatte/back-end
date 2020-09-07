@@ -1078,6 +1078,12 @@ func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string
 	var p_vis []*model.Playlist
 
 	for index, _ := range playlists {
+		if playlists[index].PlaylistVisibility == "Private" {
+			p_vis = append(p_vis, playlists[index])
+		}
+	}
+
+	for index, _ := range playlists {
 		if playlists[index].PlaylistVisibility == "Public" {
 			p_vis = append(p_vis, playlists[index])
 		}
