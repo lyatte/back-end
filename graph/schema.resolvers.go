@@ -665,14 +665,35 @@ func (r *mutationResolver) UpdateChannelImage(ctx context.Context, channelID str
 		return false, errors.New("No CHannel!")
 	}
 
-	if flag == "1"{
+	if flag == "1" {
 		channel.ChannelBackground = bg
-	} else if flag == "2"{
+	} else if flag == "2" {
 		channel.ChannelIcon = icon
 	} else {
 		channel.ChannelBackground = bg
 		channel.ChannelIcon = icon
 	}
+
+	_, updateError := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateError != nil {
+		return false, errors.New("Change subscribe failed")
+	}
+
+	return true, nil
+}
+
+func (r *mutationResolver) UpdateChannelDesc(ctx context.Context, channelID string, desc string) (bool, error) {
+	var channel model.Channel
+
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("No CHannel!")
+	}
+
+	channel.ChannelDescription = desc
 
 	_, updateError := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
 

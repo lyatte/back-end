@@ -106,6 +106,7 @@ type ComplexityRoot struct {
 		UnsubscribeChannel   func(childComplexity int, channelID string, chSubs string) int
 		UpdateAccountPremium func(childComplexity int, channelID string, premiumID string, day int, month int, year int) int
 		UpdateChannel        func(childComplexity int, channelID string, input *model.NewChannel) int
+		UpdateChannelDesc    func(childComplexity int, channelID string, desc string) int
 		UpdateChannelImage   func(childComplexity int, channelID string, bg string, icon string, flag string) int
 		UpdateCommentDl      func(childComplexity int, commentID string, channelID string, flag int) int
 		UpdateCommentRc      func(childComplexity int, commentID string) int
@@ -208,6 +209,7 @@ type MutationResolver interface {
 	CreateMembership(ctx context.Context, input *model.NewMembership) (*model.Membership, error)
 	UpdateAccountPremium(ctx context.Context, channelID string, premiumID string, day int, month int, year int) (bool, error)
 	UpdateChannelImage(ctx context.Context, channelID string, bg string, icon string, flag string) (bool, error)
+	UpdateChannelDesc(ctx context.Context, channelID string, desc string) (bool, error)
 }
 type QueryResolver interface {
 	GetVideo(ctx context.Context) ([]*model.Video, error)
@@ -719,6 +721,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateChannel(childComplexity, args["channel_id"].(string), args["input"].(*model.NewChannel)), true
+
+	case "Mutation.updateChannelDesc":
+		if e.complexity.Mutation.UpdateChannelDesc == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateChannelDesc_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateChannelDesc(childComplexity, args["channel_id"].(string), args["desc"].(string)), true
 
 	case "Mutation.updateChannelImage":
 		if e.complexity.Mutation.UpdateChannelImage == nil {
@@ -1651,6 +1665,7 @@ type Mutation{
   updateAccountPremium(channel_id: String!, premium_id: String!, day: Int!, month: Int!, year: Int!): Boolean!
 
   updateChannelImage(channel_id: String!, bg: String!, icon: String!, flag: String!): Boolean!
+  updateChannelDesc(channel_id: String!, desc: String!): Boolean!
 }
 
 
@@ -1985,6 +2000,28 @@ func (ec *executionContext) field_Mutation_updateAccountPremium_args(ctx context
 		}
 	}
 	args["year"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateChannelDesc_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["channel_id"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["channel_id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["desc"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["desc"] = arg1
 	return args, nil
 }
 
@@ -4919,6 +4956,47 @@ func (ec *executionContext) _Mutation_updateChannelImage(ctx context.Context, fi
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateChannelImage(rctx, args["channel_id"].(string), args["bg"].(string), args["icon"].(string), args["flag"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateChannelDesc(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateChannelDesc_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateChannelDesc(rctx, args["channel_id"].(string), args["desc"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9131,6 +9209,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateChannelImage":
 			out.Values[i] = ec._Mutation_updateChannelImage(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateChannelDesc":
+			out.Values[i] = ec._Mutation_updateChannelDesc(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
