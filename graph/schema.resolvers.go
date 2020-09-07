@@ -194,7 +194,33 @@ func (r *mutationResolver) CreateChannel(ctx context.Context, channelID string, 
 }
 
 func (r *mutationResolver) UpdateChannel(ctx context.Context, channelID string, input *model.NewChannel) (*model.Channel, error) {
-	panic(fmt.Errorf("not implemented"))
+	var channel model.Channel
+
+	var newCh model.Channel
+
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("No CHannel!")
+	}
+
+	err1 := r.DB.Model(&newCh).Where("channel_id = ?", input.ChannelID).Select()
+
+	if err1 != nil {
+		log.Println(err1)
+		return nil, errors.New("Channel invalid")
+	}
+
+	channel = newCh
+
+	_, updateError := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateError != nil {
+		return nil, errors.New("Change subscribe failed")
+	}
+
+	return &channel, nil
 }
 
 func (r *mutationResolver) DeleteChannel(ctx context.Context, channelID string) (bool, error) {
@@ -629,6 +655,34 @@ func (r *mutationResolver) UpdateAccountPremium(ctx context.Context, channelID s
 	return true, nil
 }
 
+func (r *mutationResolver) UpdateChannelImage(ctx context.Context, channelID string, bg string, icon string, flag string) (bool, error) {
+	var channel model.Channel
+
+	err := r.DB.Model(&channel).Where("channel_id = ?", channelID).Select()
+
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("No CHannel!")
+	}
+
+	if flag == "1"{
+		channel.ChannelBackground = bg
+	} else if flag == "2"{
+		channel.ChannelIcon = icon
+	} else {
+		channel.ChannelBackground = bg
+		channel.ChannelIcon = icon
+	}
+
+	_, updateError := r.DB.Model(&channel).Where("channel_id = ?", channelID).Update()
+
+	if updateError != nil {
+		return false, errors.New("Change subscribe failed")
+	}
+
+	return true, nil
+}
+
 func (r *queryResolver) GetVideo(ctx context.Context) ([]*model.Video, error) {
 	var videos []*model.Video
 
@@ -995,7 +1049,7 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 
 	final_vids = append(final_vids, video...)
 
-	var tempLength = len(video2)-1
+	var tempLength = len(video2) - 1
 
 	var temp []*model.Video
 
@@ -1005,13 +1059,12 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 
 	for {
 		isSame = false
-		for i := 0 ; i< len(final_vids)-1 ; i++ {
+		for i := 0; i < len(final_vids)-1; i++ {
 			log.Println(i)
 			if final_vids[i].VideoID == video2[tempLength].VideoID {
 				log.Println("waa samaa")
 
 				isSame = true
-
 
 				break
 			}
@@ -1022,8 +1075,6 @@ func (r *queryResolver) GetRelatedVideo(ctx context.Context, restriction string,
 		}
 
 		tempLength--
-
-
 
 		if tempLength < 0 {
 			log.Println(temp)
@@ -1064,8 +1115,6 @@ func (r *queryResolver) GetChannelByID(ctx context.Context, channelID string) (*
 }
 
 func (r *queryResolver) GetChannelPlaylist(ctx context.Context, channelID string) ([]*model.Playlist, error) {
-
-
 	var playlists []*model.Playlist
 
 	err := r.DB.Model(&playlists).Where("channel_id = ?", channelID).Select()

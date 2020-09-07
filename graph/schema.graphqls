@@ -237,6 +237,7 @@ type Mutation{
 
   updateAccountPremium(channel_id: String!, premium_id: String!, day: Int!, month: Int!, year: Int!): Boolean!
 
+  updateChannelImage(channel_id: String!, bg: String!, icon: String!, flag: String!): Boolean!
 }
 
 
